@@ -30,7 +30,6 @@ public class UserController {
 	@PostMapping("/login")
 	public ResponseEntity<String> login(HttpSession session, @RequestBody Map<String, Object> info) {
 		try {
-			//session.setMaxInactiveInterval(500);
 			JSONObject jso = new JSONObject(info);
 			String response = this.userService.login(jso);
 			
@@ -69,5 +68,34 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+	
+	@PostMapping("/crearUsuario")
+	public ResponseEntity<String> crearUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			String pwd1 = jso.getString("pwd1");
+			String pwd2 = jso.getString("pwd2");
+			
+			if (!pwd1.equals(pwd2))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas tienen que ser iguales");
+			else {
+				if(pwd1.length() < 8)
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña tiene que tener minimo 8 caracteres");
+			}
+				
+			String response = this.userService.crearUsuario(jso);
+			
+			if (response.equals("correo"))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
+			else {
+				return new ResponseEntity<>("Todo perfecto", HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	
+	
 	
 }
