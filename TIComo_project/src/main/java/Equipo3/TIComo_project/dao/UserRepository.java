@@ -9,4 +9,8 @@ import Equipo3.TIComo_project.model.User;
 @Repository
 public interface UserRepository extends MongoRepository <User, String>{
 
+	User findByCorreo(String correo);
+
+	void deleteByCorreo(String correoUsuario);
+	
 }
