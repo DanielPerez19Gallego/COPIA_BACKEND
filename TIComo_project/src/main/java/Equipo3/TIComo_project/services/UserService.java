@@ -57,7 +57,7 @@ public class UserService {
 			return this.correo;
 		
 		User user = crearUsuarioAux(jso);
-		user.setRol("client");
+		user.setRol(this.client);
 		
 		clientt.setCorreo(jso.getString(this.correo));
 		clientt.setDireccion(jso.getString("direccion"));
@@ -89,7 +89,6 @@ public class UserService {
 		} else {
 			Admin admin = new Admin();
 			admin.setCorreo(jso.getString(this.correo));
-			admin.setDepartamento(jso.getString("departamento"));
 			admin.setZona(jso.getString("zona"));
 			this.adminDAO.save(admin);
 		}
@@ -106,6 +105,23 @@ public class UserService {
 		user.setNif(jso.getString("nif"));
 		user.setNombre(jso.getString("nombre"));
 		return user;
+	}
+
+	public String eliminarUsuario(String correoUsuario) {
+		User user = this.userDAO.findByCorreo(correoUsuario);
+		if (user != null) {
+			String rol = user.getRol();
+			if (rol.equals("rider")) {
+				this.riderDAO.deleteByCorreo(correoUsuario);
+			}else if (rol.equals(this.client)) {
+				this.clientDAO.deleteByCorreo(correoUsuario);
+			}else {
+				this.adminDAO.deleteByCorreo(correoUsuario);
+			}
+		}else return this.correo;
+		
+		this.userDAO.deleteByCorreo(correoUsuario);
+		return "perfecto";
 	}
 	
 }
