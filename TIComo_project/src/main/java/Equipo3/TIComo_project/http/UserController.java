@@ -1,5 +1,6 @@
 package Equipo3.TIComo_project.http;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -8,13 +9,17 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import Equipo3.TIComo_project.model.User;
 import Equipo3.TIComo_project.services.UserService;
 
 
@@ -26,6 +31,8 @@ public class UserController {
 	private UserService userService;
 	
 	private String correo = "correo";
+	
+	private String rol = "rol";
 	
 	@PostMapping("/login")
 	public ResponseEntity<String> login(HttpSession session, @RequestBody Map<String, Object> info) {
@@ -111,5 +118,52 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+	@GetMapping("/getUsuarios")//Devuelve todos los Users
+	public ResponseEntity<String> consultarUsuarios() {
+		List <User> listaResponse;
+		try {
+			listaResponse = this.userService.consultarUsuarios();  //Recojo la lista en una variable.
+			if(listaResponse.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ningun usuario en la base de datos");
+			}else {
+				JSONObject jso = new JSONObject(); //Mando la lista con todos los users en un JSON.
+				return new ResponseEntity<>(jso.put("todos",listaResponse)+"Todos los usuarios actuales de la base de datos.", HttpStatus.OK);
+			}
+			
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	@GetMapping("/getUsuario/{correo}")//Devuelve un único user.
+	public ResponseEntity<String> consultarUsuario(@PathVariable String correo) {
+		User unico = new User();
+		try {
+			unico = this.userService.consultarUsuario(correo);  //El usuario que quiero lo meto en la variable.
+			
+			if(unico.getCorreo().equals(correo)) {
+				JSONObject jso = new JSONObject(); 
+				jso.put("correo", unico.getCorreo());
+				jso.put("password", unico.getPassword());
+				jso.put("nombre", unico.getNombre());
+				jso.put("apellidos", unico.getApellidos());
+				jso.put("nif", unico.getNif());
+				jso.put("rol", unico.getRol());
+				return new ResponseEntity<>(jso+"usuario encontrado", HttpStatus.OK); //Mando el user en json
+
+			}else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ese usuario en la base de datos");
+
+			}
+			
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	
+	
 	
 }
+	
+
