@@ -4,10 +4,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection="Admins")
 public class Admin {
-
+	private String correo;
 	private String zona;
 	private String departamento;
 	
+	public String getCorreo() {
+		return correo;
+	}
+
+	public void setCorreo(String correo) {
+		this.correo = correo;
+	}
+
 	public String getZona() {
 		return zona;
 	}

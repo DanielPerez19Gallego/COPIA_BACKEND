@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,18 +26,20 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
+	private String correo = "correo";
+	
+	@CrossOrigin
 	@PostMapping("/login")
 	public ResponseEntity<String> login(HttpSession session, @RequestBody Map<String, Object> info) {
 		try {
-			session.setMaxInactiveInterval(500);
 			JSONObject jso = new JSONObject(info);
-			JSONObject response = this.userService.login(jso);
-			String resp = response.getString("errorMessage");
-			if (resp.equals("Response status 400"))
+			String response = this.userService.login(jso);
+			
+			if (response.equals("nulo"))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario o password desconocidas");
 			else {
-				session.setAttribute("userName", jso.getString("name"));
-				return new ResponseEntity<>("Inicio de sesion correcto", HttpStatus.OK);
+				session.setAttribute(this.correo, jso.getString(this.correo));
+				return new ResponseEntity<>("Inicio de sesion correcto como "+ response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -46,10 +49,20 @@ public class UserController {
 	public ResponseEntity<String> register(@RequestBody Map<String, Object> info, HttpSession session) {
 		try {
 			JSONObject jso = new JSONObject(info);
+			String pwd1 = jso.getString("pwd1");
+			String pwd2 = jso.getString("pwd2");
+			
+			if (!pwd1.equals(pwd2))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas tienen que ser iguales");
+			else {
+				if(pwd1.length() < 8)
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña tiene que tener minimo 8 caracteres");
+			}
+				
 			String response = this.userService.register(jso);
 			
-			if (!response.equals("perfe"))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese email");
+			if (response.equals("correo"))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
 			else {
 				return new ResponseEntity<>("Todo perfecto", HttpStatus.OK);
 			}
@@ -57,5 +70,34 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+	
+	@PostMapping("/crearUsuario")
+	public ResponseEntity<String> crearUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			String pwd1 = jso.getString("pwd1");
+			String pwd2 = jso.getString("pwd2");
+			
+			if (!pwd1.equals(pwd2))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas tienen que ser iguales");
+			else {
+				if(pwd1.length() < 8)
+					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña tiene que tener minimo 8 caracteres");
+			}
+				
+			String response = this.userService.crearUsuario(jso);
+			
+			if (response.equals("correo"))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
+			else {
+				return new ResponseEntity<>("Todo perfecto", HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	
+	
 	
 }

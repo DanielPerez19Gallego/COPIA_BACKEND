@@ -10,7 +10,17 @@ public class Rider {
 	@Field("Matricula")
 	private String matricula;
 	private boolean carnet;
+	private String correo;
 	
+	
+	public String getCorreo() {
+		return correo;
+	}
+
+	public void setCorreo(String correo) {
+		correo = correo;
+	}
+
 	public String getMatricula() {
 		return matricula;
 	}

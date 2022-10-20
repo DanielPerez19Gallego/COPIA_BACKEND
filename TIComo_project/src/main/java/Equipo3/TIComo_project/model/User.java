@@ -10,6 +10,15 @@ public class User {
 	private String nombre;
 	private String apellidos;
 	private String nif;
+	private String rol;
+
+	public String getRol() {
+		return rol;
+	}
+
+	public void setRol(String rol) {
+		this.rol = rol;
+	}
 
 	public String getCorreo() {
 		return correo;
