@@ -43,7 +43,7 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
-	@PutMapping("/register")
+	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody Map<String, Object> info, HttpSession session) {
 		try {
 			JSONObject jso = new JSONObject(info);
@@ -59,10 +59,10 @@ public class UserController {
 				
 			String response = this.userService.register(jso);
 			
-			if (response.equals("correo"))
+			if (response.equals(this.correo))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
 			else {
-				return new ResponseEntity<>("Todo perfecto", HttpStatus.OK);
+				return new ResponseEntity<>("Registro completado", HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -85,17 +85,31 @@ public class UserController {
 				
 			String response = this.userService.crearUsuario(jso);
 			
-			if (response.equals("correo"))
+			if (response.equals(this.correo))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
 			else {
-				return new ResponseEntity<>("Todo perfecto", HttpStatus.OK);
+				return new ResponseEntity<>(jso.getString("rol")+" creado correctamente", HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
 	
-	
-	
+	@PostMapping("/eliminarUsuario")
+	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			String correoUsuario = jso.getString(this.correo);
+			String response = this.userService.eliminarUsuario(correoUsuario);
+			
+			if (response.equals(this.correo))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un usuario con ese correo");
+			else {
+				return new ResponseEntity<>("Usuario eliminado correctamente", HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
 	
 }
