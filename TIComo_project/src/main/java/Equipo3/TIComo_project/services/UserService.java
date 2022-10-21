@@ -2,12 +2,15 @@ package Equipo3.TIComo_project.services;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import Equipo3.TIComo_project.model.User;
+import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
+
 import java.util.Collections;
 import Equipo3.TIComo_project.model.Admin;
 import Equipo3.TIComo_project.model.Client;
@@ -130,22 +133,45 @@ public class UserService {
 	}
 	public List<User> consultarUsuarios() {
 		if(!this.userDAO.findAll().isEmpty()) {
-			return this.userDAO.findAll(); //Este tiene users.
+			return this.userDAO.findAll(); //Este tiene todos los users.
 		}else {
 			return this.userDAO.findAll(); //Lo devuelve tal y como esta, vacío.
 		}
 
 	}
-	public User consultarUsuario(String correo) {
-		
-		User unico = null;
+	public List <User> consultarUsuario(String correo) {
+
+
+		List <User> unico = null;
 		if(!this.userDAO.findAll().isEmpty()) {
-			unico = this.userDAO.findByCorreo(correo); //Este tiene el user querido.
-			return unico;
+			unico = this.userDAO.findAllByCorreo(correo); //Este tiene el user o los users querido.
+			return  unico;
 		}
-		return unico;
-		
+		return  unico;
+
 	}
 
+	public User actualizarUsuario(String correo,JSONObject json) {
+		
+		User nuevo = this.userDAO.findByCorreo(correo);
+		if (nuevo!=null) {
+			nuevo.setCorreo(json.getString("correo"));
+			nuevo.setPassword(json.getString("password"));
+			nuevo.setNombre(json.getString("nombre"));
+			nuevo.setApellidos(json.getString("apellidos"));
+			nuevo.setNif(json.getString("nif"));
+			nuevo.setRol(json.getString("rol"));
+			userDAO.deleteByCorreo(correo);
+			userDAO.save(nuevo);
+			
+			return nuevo;
+		}else 
+			return nuevo;
+		
+	
+	}
+
+
 }
+
 
