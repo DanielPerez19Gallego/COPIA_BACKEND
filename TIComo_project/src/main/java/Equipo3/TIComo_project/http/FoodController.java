@@ -23,16 +23,51 @@ public class FoodController {
 	@Autowired
 	private FoodService foodService;
 	
+	private String nombre = "nombre";
+	
 	@PostMapping("/crearRestaurante")
 	public ResponseEntity<String> crearRestaurante(HttpSession session, @RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			String response = this.foodService.crearRestaurante(jso);
 			
-			if (response.equals("nulo"))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario o password desconocidas");
+			if (response.equals(this.nombre))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un restaurante con ese nombre");
 			else {
-				return new ResponseEntity<>("Inicio de sesion correcto como "+ response, HttpStatus.OK);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	@PostMapping("/eliminarRestaurante")
+	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			String nombreRes = jso.getString(this.nombre);
+			String response = this.foodService.eliminarRestaurante(nombreRes);
+			
+			if (response.equals(this.nombre))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un restaurante llamado " + nombreRes);
+			else {
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	//Prueba para eliminar restaurante
+	@PostMapping("/crearPlato")
+	public ResponseEntity<String> crearPlato(@RequestBody Map<String, Object> info, HttpSession session) {
+		try {
+			JSONObject jso = new JSONObject(info);	
+			String response = this.foodService.crearPlato(jso);
+			if (response.equals(this.nombre))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un plato con ese nombre");
+			else {
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
