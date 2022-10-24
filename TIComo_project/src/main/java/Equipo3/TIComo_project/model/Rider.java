@@ -6,21 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection="Riders")
 public class Rider {
 
+	private String correo;
 	private String tipovehiculo;
-	@Field("Matricula")
 	private String matricula;
 	private boolean carnet;
-	private String correo;
 	
-	
-	public String getCorreo() {
-		return correo;
-	}
-
-	public void setCorreo(String correo) {
-		correo = correo;
-	}
-
 	public String getMatricula() {
 		return matricula;
 	}
@@ -43,5 +33,13 @@ public class Rider {
 	
 	public void setCarnet(boolean carnet) {
 		this.carnet = carnet;
+	}
+
+	public String getCorreo() {
+		return correo;
+	}
+
+	public void setCorreo(String correo) {
+		this.correo = correo;
 	}
 }
