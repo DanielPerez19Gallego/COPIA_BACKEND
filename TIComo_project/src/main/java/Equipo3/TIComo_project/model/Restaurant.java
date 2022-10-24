@@ -12,12 +12,22 @@ public class Restaurant {
 	private String telefono;
 	private String email;
 	private String categoria;
+	private String correo;
 	//private String valoracion;
 	private Plate[] carta;
 	
 	public String getNombre() {
 		return nombre;
 	}
+	
+	public String getCorreo() {
+		return correo;
+	}
+
+	public void setCorreo(String correo) {
+		this.correo = correo;
+	}
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
