@@ -11,19 +11,12 @@ public class Plate {
 	private String descripcion;
 	private String precio;
 	private boolean aptoVegano;
-	private String correo;
+	private String nombreRestaurante;
+	
 	public String getNombre() {
 		return nombre;
 	}
 	
-	public String getCorreo() {
-		return correo;
-	}
-
-	public void setCorreo(String correo) {
-		this.correo = correo;
-	}
-
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
@@ -58,6 +51,14 @@ public class Plate {
 	
 	public void setAptoVegano(boolean aptoVegano) {
 		this.aptoVegano = aptoVegano;
+	}
+
+	public String getNombreRestaurante() {
+		return nombreRestaurante;
+	}
+
+	public void setNombreRestaurante(String nombreRestaurante) {
+		this.nombreRestaurante = nombreRestaurante;
 	}
 }
 
