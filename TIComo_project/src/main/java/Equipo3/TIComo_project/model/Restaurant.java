@@ -1,5 +1,6 @@
 package Equipo3.TIComo_project.model;
 
+import org.json.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection="Restaurants")
@@ -55,6 +56,18 @@ public class Restaurant {
 	}
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
+	}
+	
+	public JSONObject toJSON() {
+		JSONObject jso = new JSONObject();
+		jso.put("nombre", nombre);
+		jso.put("razonSocial", razonSocial);
+		jso.put("cif", cif);
+		jso.put("direccion", direccion);
+		jso.put("telefono", telefono);
+		jso.put("email", email);
+		jso.put("categoria", categoria);
+		return jso;
 	}
 	
 }
