@@ -1,5 +1,6 @@
 package Equipo3.TIComo_project.model;
 
+import org.json.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection="Plates")
@@ -60,5 +61,15 @@ public class Plate {
 	public void setNombreRestaurante(String nombreRestaurante) {
 		this.nombreRestaurante = nombreRestaurante;
 	}
+	 public JSONObject toJSON() {
+        JSONObject jso = new JSONObject();
+        jso.put("nombre", nombre);
+        jso.put("foto", foto);
+        jso.put("descripcion", descripcion);
+        jso.put("precio", precio);
+        jso.put("aptoVegano", aptoVegano);
+        jso.put("nombreRestaurante", nombreRestaurante);
+        return jso;
+	 }
 }
 

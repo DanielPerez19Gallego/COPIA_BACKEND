@@ -1,7 +1,6 @@
 package Equipo3.TIComo_project.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection="Riders")
 public class Rider {
