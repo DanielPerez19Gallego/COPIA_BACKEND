@@ -57,7 +57,7 @@ public class UserController {
 		}
 	}
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody Map<String, Object> info, HttpSession session) {
+	public ResponseEntity<String> register(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			String pwd1 = jso.getString("pwd1");
@@ -83,7 +83,7 @@ public class UserController {
 	}
 
 	@PostMapping("/crearUsuario")
-	public ResponseEntity<String> crearUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+	public ResponseEntity<String> crearUsuario(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			String pwd1 = jso.getString("pwd1");
@@ -109,7 +109,7 @@ public class UserController {
 	}
 
 	@PostMapping("/eliminarUsuario")
-	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			String correoUsuario = jso.getString(this.correo);
@@ -125,7 +125,7 @@ public class UserController {
 		}
 	}
 	@CrossOrigin
-	@GetMapping("/getRiders")//Devuelve todos los Users
+	@GetMapping("/getRiders")
 	public ResponseEntity<String> consultarRiders() {
 		List<Rider> listaResponse;
 		try {
@@ -133,8 +133,7 @@ public class UserController {
 			if(listaResponse.isEmpty()) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ningun usuario en la base de datos");
 			}else {
-				JSONObject jso = new JSONObject(); //Mando la lista con todos los users en un JSON.
-				return new ResponseEntity<>(jso.put("Riders",listaResponse)+"Todos los usuarios actuales de la base de datos.", HttpStatus.OK);
+				return new ResponseEntity<>(this.userService.userRiders(listaResponse), HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
@@ -142,7 +141,7 @@ public class UserController {
 		}
 	}
 	@CrossOrigin
-	@GetMapping("/getAdmins")//Devuelve todos los Users
+	@GetMapping("/getAdmins")
 	public ResponseEntity<String> consultarAdmins() {
 		List<Admin> listaResponse;
 		try {
@@ -150,8 +149,7 @@ public class UserController {
 			if(listaResponse.isEmpty()) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ningun usuario en la base de datos");
 			}else {
-				JSONObject jso = new JSONObject(); //Mando la lista con todos los users en un JSON.
-				return new ResponseEntity<>(jso.put("Admins",listaResponse)+"Todos los usuarios actuales de la base de datos.", HttpStatus.OK);
+				return new ResponseEntity<>(this.userService.userAdmins(listaResponse), HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
@@ -160,7 +158,7 @@ public class UserController {
 	}
 	
 	@CrossOrigin
-	@GetMapping("/getClients")//Devuelve todos los Users
+	@GetMapping("/getClients")
 	public ResponseEntity<String> consultarClients() {
 		List<Client> listaResponse;
 		try {
@@ -168,8 +166,7 @@ public class UserController {
 			if(listaResponse.isEmpty()) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ningun usuario en la base de datos");
 			}else {
-				JSONObject jso = new JSONObject(); //Mando la lista con todos los users en un JSON.
-				return new ResponseEntity<>(jso.put("Clientes",listaResponse)+"Todos los usuarios actuales de la base de datos.", HttpStatus.OK);
+				return new ResponseEntity<>(this.userService.userClients(listaResponse), HttpStatus.OK);
 			}
 
 		} catch (Exception e) {

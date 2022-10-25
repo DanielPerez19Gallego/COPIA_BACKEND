@@ -131,19 +131,19 @@ public class UserService {
 		this.userDAO.deleteByCorreo(correoUsuario);
 		return "perfecto";
 	}
-	
+
 	public List<Rider> consultarRiders(){
 		return this.riderDAO.findAll();
 	}
 	public List<Admin> consultarAdmins(){
 		return this.adminDAO.findAll();
 	}
-	
+
 	public List<Client> consultarClients(){
 		return this.clientDAO.findAll();
 	}
-	
-	
+
+
 
 	public boolean actualizarUsuario(String correo,JSONObject json) {
 		boolean actualizado = false;
@@ -157,13 +157,105 @@ public class UserService {
 			nuevo.setRol(json.getString("rol"));
 			userDAO.deleteByCorreo(correo);
 			userDAO.save(nuevo);
-			
+
 			return actualizado = true;
 		}else 
 			return actualizado;
-		
-	
+
+
 	}
+	//Riders
+	public JSONObject userRider(Rider rid) {
+		User user = this.userDAO.findByCorreo(rid.getCorreo());
+		JSONObject jso = new JSONObject();
+		jso.put("nombre", user.getNombre());
+		jso.put("contraseña", user.getPassword());
+		jso.put("apellidos", user.getApellidos());
+		jso.put(this.correo, correo);
+		jso.put("tipoVehiculo", rid.getTipovehiculo());
+		jso.put("nif", user.getNif());
+		jso.put("carnet", rid.isCarnet());
+		jso.put("matricula", rid.getMatricula());
+		return jso;	
+	}
+
+	public String userRiders(List<Rider> list) {
+		String riders = "";
+		for (int i = 0; i<list.size(); i++) {
+			Rider rid = list.get(i);
+			JSONObject jso = this.userRider(rid);
+			if (i == list.size() - 1)
+				riders = riders + jso.toString();
+			else
+				riders = riders + jso.toString() + ";";
+		}
+		riders = riders.replace(" ", "");
+		riders = riders.replace("[", "");
+		riders = riders.replace("]", "");
+		return riders;
+	}
+	//Admins
+	public JSONObject userAdmin(Admin admin) {
+		User user = this.userDAO.findByCorreo(admin.getCorreo());
+		JSONObject jso = new JSONObject();
+		jso.put("nombre", user.getNombre());
+		jso.put("contraseña", user.getPassword());
+		jso.put("apellidos", user.getApellidos());
+		jso.put(this.correo, correo);
+		jso.put("nif", user.getNif());
+		jso.put("zona",admin.getZona());
+	
+		return jso;	
+	}
+
+	public String userAdmins(List<Admin> list) {
+		String admins = "";
+		for (int i = 0; i<list.size(); i++) {
+			Admin admin = list.get(i);
+			JSONObject jso = this.userAdmin(admin);
+			if (i == list.size() - 1)
+				admins = admins + jso.toString();
+			else
+				admins = admins + jso.toString() + ";";
+		}
+		admins = admins.replace(" ", "");
+		admins = admins.replace("[", "");
+		admins = admins.replace("]", "");
+		return admins;
+	}
+	
+	//Clientes
+	public JSONObject userClient(Client client) {
+		User user = this.userDAO.findByCorreo(client.getCorreo());
+		JSONObject jso = new JSONObject();
+		jso.put("nombre", user.getNombre());
+		jso.put("contraseña", user.getPassword());
+		jso.put("apellidos", user.getApellidos());
+		jso.put(this.correo, correo);
+		jso.put("nif", user.getNif());
+		jso.put("direccion", client.getDireccion());
+		jso.put("telefono", client.getTelefono());
+	
+		return jso;	
+	}
+
+	
+	public String userClients(List<Client> list) {
+		String clients = "";
+		for (int i = 0; i<list.size(); i++) {
+			Client client= list.get(i);
+			JSONObject jso = this.userClient(client);
+			if (i == list.size() - 1)
+				clients = clients + jso.toString();
+			else
+				clients = clients + jso.toString() + ";";
+		}
+		clients = clients.replace(" ", "");
+		clients = clients.replace("[", "");
+		clients = clients.replace("]", "");
+		return clients;
+	}
+
 
 
 }
