@@ -1,6 +1,5 @@
 package Equipo3.TIComo_project.services;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -21,24 +20,24 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userDAO;
-	
+
 	@Autowired
 	private ClientRepository clientDAO;
-	
+
 	@Autowired
 	private RiderRepository riderDAO;
-	
+
 	@Autowired
 	private AdminRepository adminDAO;
-	
+
 	private String correo = "correo";
 	private String client = "client";
 	private String rider = "rider";
-	
+
 	public String[] comprobarPassword(JSONObject info) {
-		
+
 		String[] list = new String[2];
-		
+
 		String pwd1 = info.getString("pwd1");
 		String pwd2 = info.getString("pwd2");
 		list[0] = "false";
@@ -65,7 +64,7 @@ public class UserService {
 		}
 		return list;
 	}
-	
+
 	public String login(JSONObject jso) {
 		String rol = "nulo";
 		User user = this.userDAO.findByCorreo(jso.getString(this.correo));
@@ -82,37 +81,37 @@ public class UserService {
 		}
 		return rol;
 	}
-	
+
 	public String register(JSONObject jso) {
-		
+
 		Client clientt = new Client();
 		User userEmail = this.userDAO.findByCorreo(jso.getString(this.correo));
 		if (userEmail != null) 
 			return this.correo;
-		
+
 		User user = crearUsuarioAux(jso);
 		user.setRol(this.client);
-		
+
 		clientt.setCorreo(jso.getString(this.correo));
 		clientt.setDireccion(jso.getString("direccion"));
 		clientt.setTelefono(jso.getString("telefono"));
-		
+
 		this.clientDAO.save(clientt);
 		this.userDAO.save(user);
 		return "Registro completado";
 	}
 
 	public String crearUsuario(JSONObject jso) {
-		
+
 		User userEmail = this.userDAO.findByCorreo(jso.getString(this.correo));
 		if (userEmail != null) 
 			return this.correo;
-		
+
 		String rol = jso.getString("rol");
-		
+
 		User user = crearUsuarioAux(jso);
 		user.setRol(rol);
-		
+
 		if (rol.equals(this.rider)) {
 			Rider riderr = new Rider();
 			riderr.setCarnet(Boolean.valueOf(jso.getString("carnet")));
@@ -129,9 +128,9 @@ public class UserService {
 		this.userDAO.save(user);
 		return rol + " creado correctamente";
 	}
-	
+
 	public User crearUsuarioAux(JSONObject jso) {
-		
+
 		User user = new User();
 		user.setCorreo(jso.getString(this.correo));
 		user.setPassword(jso.getString("pwd1"));
@@ -153,28 +152,13 @@ public class UserService {
 				this.adminDAO.deleteByCorreo(correoUsuario);
 			}
 		}else return this.correo;
-		
+
 		this.userDAO.deleteByCorreo(correoUsuario);
 		return "Usuario eliminado correctamente";
 	}
-	
-	public List<User> consultarUsuarios() {
-		return this.userDAO.findAll();
-	}
-	public List <User> consultarUsuario(String correo) {
-
-
-		List <User> unico = null;
-		if(!this.userDAO.findAll().isEmpty()) {
-			unico = this.userDAO.findAllByCorreo(correo); //Este tiene el user o los users querido.
-			return  unico;
-		}
-		return  unico;
-
-	}
 
 	public User actualizarUsuario(String correo,JSONObject json) {
-		
+
 		User nuevo = this.userDAO.findByCorreo(correo);
 		if (nuevo!=null) {
 			nuevo.setCorreo(json.getString("correo"));
@@ -185,12 +169,12 @@ public class UserService {
 			nuevo.setRol(json.getString("rol"));
 			this.userDAO.deleteByCorreo(correo);
 			this.userDAO.save(nuevo);
-			
+
 			return nuevo;
 		}else 
 			return nuevo;
 	}
-	
+
 	public JSONObject userRider(Rider rid) {
 		User user = this.userDAO.findByCorreo(rid.getCorreo());
 		JSONObject jso = new JSONObject();
@@ -204,7 +188,7 @@ public class UserService {
 		jso.put("matricula", rid.getMatricula());
 		return jso;	
 	}
-	
+
 	public String userRiders(List<Rider> list) {
 		String riders = "";
 		for (int i = 0; i<list.size(); i++) {
@@ -219,6 +203,75 @@ public class UserService {
 		riders = riders.replace("[", "");
 		riders = riders.replace("]", "");
 		return riders;
+	}
+
+	public JSONObject userAdmin(Admin admin) {
+		User user = this.userDAO.findByCorreo(admin.getCorreo());
+		JSONObject jso = new JSONObject();
+		jso.put("nombre", user.getNombre());
+		jso.put("contraseña", user.getPassword());
+		jso.put("apellidos", user.getApellidos());
+		jso.put(this.correo, correo);
+		jso.put("nif", user.getNif());
+		jso.put("zona",admin.getZona());
+		return jso;    
+	}
+
+	public String userAdmins(List<Admin> list) {
+		String admins = "";
+		for (int i = 0; i<list.size(); i++) {
+			Admin admin = list.get(i);
+			JSONObject jso = this.userAdmin(admin);
+			if (i == list.size() - 1)
+				admins = admins + jso.toString();
+			else
+				admins = admins + jso.toString() + ";";
+		}
+		admins = admins.replace(" ", "");
+		admins = admins.replace("[", "");
+		admins = admins.replace("]", "");
+		return admins;
+	}
+
+	public JSONObject userClient(Client client) {
+		User user = this.userDAO.findByCorreo(client.getCorreo());
+		JSONObject jso = new JSONObject();
+		jso.put("nombre", user.getNombre());
+		jso.put("contraseña", user.getPassword());
+		jso.put("apellidos", user.getApellidos());
+		jso.put(this.correo, correo);
+		jso.put("nif", user.getNif());
+		jso.put("direccion", client.getDireccion());
+		jso.put("telefono", client.getTelefono());
+		return jso;    
+	}
+
+	public String userClients(List<Client> list) {
+		String clients = "";
+		for (int i = 0; i<list.size(); i++) {
+			Client clientt= list.get(i);
+			JSONObject jso = this.userClient(clientt);
+			if (i == list.size() - 1)
+				clients = clients + jso.toString();
+			else
+				clients = clients + jso.toString() + ";";
+		}
+		clients = clients.replace(" ", "");
+		clients = clients.replace("[", "");
+		clients = clients.replace("]", "");
+		return clients;
+	}
+
+	public List<Rider> consultarRiders(){
+		return this.riderDAO.findAll();
+	}
+
+	public List<Admin> consultarAdmins(){
+		return this.adminDAO.findAll();
+	}
+
+	public List<Client> consultarClients(){
+		return this.clientDAO.findAll();
 	}
 }
 
