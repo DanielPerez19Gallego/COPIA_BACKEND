@@ -36,50 +36,18 @@ public class FoodService {
 	public String eliminarRestaurante(String nombreRes) {
 		Restaurant res = this.restDAO.findByNombre(nombreRes);
 		if (res != null) {
-			List <Plate> platos = this.platoDAO.findBynombreRestaurante(nombreRes);
-			if (!platos.isEmpty()) {
-				for (int i = 0 ; i<platos.size() ; i++) {
-					this.platoDAO.deleteByNombre(platos.get(i).getNombre());
-				}
-			}
+			this.platoDAO.deleteBynombreRestaurante(nombreRes);
 		}else return this.nombre;
 
 		this.restDAO.deleteByNombre(nombreRes);
 		return "Restaurante eliminado correctamente";
 	}
 
-	public String crearPlato(JSONObject jso) {
-		Plate plaNombre = this.platoDAO.findByNombre(jso.getString(this.nombre));
-		if (plaNombre != null) 
-			return this.nombre;
-		Plate pla = new Plate();
-		pla.setAptoVegano(Boolean.valueOf(jso.getString("aptoVegano")));
-		pla.setDescripcion(jso.getString("descripcion"));
-		pla.setPrecio(jso.getString("precio"));
-		pla.setNombreRestaurante(jso.getString("nombreRestaurante"));
-		pla.setNombre(jso.getString(this.nombre));
-		pla.setFoto(jso.getString("foto"));
-		platoDAO.save(pla);
-		return "Plato creado correctamente";
-	}
-
 	public String actualizarRestaurante(JSONObject jso) {
 		String nombreViejo = jso.getString("nombreViejo");
-		String nombreNuevo = jso.getString(this.nombre);
 		Restaurant res = this.restDAO.findByNombre(nombreViejo);
 		if (res == null) 
 			return this.nombre;
-
-		List <Plate> platos = this.platoDAO.findBynombreRestaurante(nombreViejo);
-		if (!platos.isEmpty()) {
-			for (int i = 0 ; i<platos.size() ; i++) {
-				Plate plato = platos.get(i);
-				this.platoDAO.deleteByNombre(plato.getNombre());
-				plato.setNombreRestaurante(nombreNuevo);
-				this.platoDAO.save(plato);
-			}
-		}
-
 		this.restDAO.deleteByNombre(nombreViejo);
 		res = this.crearRestAux(jso, res);
 		this.restDAO.save(res);
@@ -98,77 +66,91 @@ public class FoodService {
 	}
 
 	public String consultarRestaurantes() {
+		StringBuilder bld = new StringBuilder();
 		List <Restaurant> restaurantes = this.restDAO.findAll();
-		String response = "";
 		if (!restaurantes.isEmpty()) {
 			for (int i=0; i<restaurantes.size(); i++) {
 				Restaurant res = restaurantes.get(i);
 				JSONObject resJSO = res.toJSON();
 				if (i == restaurantes.size() - 1)
-					response = response + resJSO.toString();
+					bld.append(resJSO.toString());
 				else
-					response = response + resJSO.toString() + ";";
+					bld.append(resJSO.toString() + ";");
 			}
-			response = response.replace(" ", "");
-			response = response.replace("[", "");
-			response = response.replace("]", "");
+			return bld.toString().replace(" ", "");
 		}
-		return response;
+		return "";
 	}
 
 	public String eliminarCarta(String nombreRes) {
 		Restaurant res = this.restDAO.findByNombre(nombreRes);
 		if (res == null)
 			return this.nombre;
-		List <Plate> platos = this.platoDAO.findBynombreRestaurante(nombreRes);
-		if (!platos.isEmpty()) {
-			for (int i = 0 ; i<platos.size() ; i++) {
-				Plate plato = platos.get(i);
-				this.platoDAO.deleteByNombre(plato.getNombre());
-			}
-		}
+		this.platoDAO.deleteBynombreRestaurante(nombreRes);
 		return "Carta eliminada correctamente";
 
 	}
 
+	public String crearPlato(JSONObject jso) {
+		String nombrePlato = jso.getString(this.nombre);
+		String nombreRestaurante = jso.getString("nombreRestaurante");
+		if (this.existePlatoenRestaurante(nombrePlato, nombreRestaurante)) 
+			return this.nombre;
+		Plate pla = new Plate();
+		pla = this.crearPlatoAux(jso, pla);
+		pla.setNombreRestaurante(nombreRestaurante);
+		platoDAO.save(pla);
+		return "Plato creado correctamente";
+	}
+	
+	public boolean existePlatoenRestaurante(String nombreP, String nombreR) {
+		List<Plate> platos = this.platoDAO.findByNombreAndRestaurante(nombreP, nombreR);
+		return !platos.isEmpty();
+	}
+	
+	public Plate crearPlatoAux(JSONObject jso, Plate pla) {
+		pla.setAptoVegano(Boolean.valueOf(jso.getString("aptoVegano")));
+		pla.setDescripcion(jso.getString("descripcion"));
+		pla.setPrecio(jso.getString("precio"));
+		pla.setNombre(jso.getString(this.nombre));
+		pla.setFoto(jso.getString("foto"));
+		return pla;
+	}
+	
 	public String actualizarPlato(JSONObject jso) {
 		String nombreViejo = jso.getString("nombreViejo");
 		String nombreNuevo = jso.getString(this.nombre);
-		Plate plato = this.platoDAO.findByNombre(nombreViejo);
+		String nombreRestaurante = jso.getString("nombreRestaurante");
+		Plate plato = this.platoDAO.findPlato(nombreViejo, nombreRestaurante);
 		
-		if (plato == null) 
+		if (plato == null)
+			return "noexiste";
+		if (this.existePlatoenRestaurante(nombreNuevo, nombreRestaurante)) 
 			return this.nombre;
 		
-		plato.setAptoVegano(Boolean.valueOf(jso.getString("aptoVegano")));
-		plato.setDescripcion(jso.getString("descripcion"));
-		plato.setFoto(jso.getString("foto"));
-		plato.setNombreRestaurante(jso.getString("nombreRestaurante"));
-		plato.setNombre(nombreNuevo);
-		plato.setPrecio(jso.getString("precio"));
+		plato = this.crearPlatoAux(jso, plato);
 		
-		this.platoDAO.deleteByNombre(nombreViejo);
+		this.platoDAO.deletePlato(nombreViejo, nombreRestaurante);
 		this.platoDAO.save(plato);
 		
 		return "Plato actualizado correctamente";
 	}
 
 	public String platosParaEnviar(String nombreRestaurante) {
-		String listPlatos = "";
+		StringBuilder bld = new StringBuilder();
 		List<Plate> listaPlatos = this.platoDAO.findBynombreRestaurante(nombreRestaurante);
 		if(!listaPlatos.isEmpty()) {
 			for (int i = 0; i<listaPlatos.size(); i++) {
 				Plate plato= listaPlatos.get(i);
 				JSONObject jso = plato.toJSON();
 				if (i == listaPlatos.size() - 1)
-					listPlatos = listPlatos + jso.toString();
+					bld.append(jso.toString());
 				else
-					listPlatos = listPlatos + jso.toString() + ";";
+					bld.append(jso.toString() + ";");
 			}
-			listPlatos = listPlatos.replace(" ", "");
-			listPlatos = listPlatos.replace("[", "");
-			listPlatos = listPlatos.replace("]", "");
+			return bld.toString().replace(" ", "");
 		}
-		return listPlatos;
+		return "";
 	}
 
 }

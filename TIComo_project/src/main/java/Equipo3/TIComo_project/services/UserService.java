@@ -33,6 +33,15 @@ public class UserService {
 	private String correo = "correo";
 	private String client = "client";
 	private String rider = "rider";
+	private String admin = "admin";
+	private String direccion = "direccion";
+	private String carnet = "carnet";
+	private String telefono = "telefono";
+	private String nombre = "nombre";
+	private String matricula = "matricula";
+	private String apellidos = "apellidos";
+	private String password = "contraseña";
+
 
 	public String[] comprobarPassword(JSONObject info) {
 
@@ -73,8 +82,8 @@ public class UserService {
 			if (user.getPassword().equals(pwd)) {
 				if (user.getRol().equals(this.client))
 					rol = this.client;
-				else if (user.getRol().equals("admin"))
-					rol = "admin";
+				else if (user.getRol().equals(this.admin))
+					rol = this.admin;
 				else 
 					rol = this.rider;
 			}
@@ -93,8 +102,8 @@ public class UserService {
 		user.setRol(this.client);
 
 		clientt.setCorreo(jso.getString(this.correo));
-		clientt.setDireccion(jso.getString("direccion"));
-		clientt.setTelefono(jso.getString("telefono"));
+		clientt.setDireccion(jso.getString(this.direccion));
+		clientt.setTelefono(jso.getString(this.telefono));
 
 		this.clientDAO.save(clientt);
 		this.userDAO.save(user);
@@ -114,16 +123,16 @@ public class UserService {
 
 		if (rol.equals(this.rider)) {
 			Rider riderr = new Rider();
-			riderr.setCarnet(Boolean.valueOf(jso.getString("carnet")));
+			riderr.setCarnet(Boolean.valueOf(jso.getString(this.carnet)));
 			riderr.setCorreo(jso.getString(this.correo));
-			riderr.setMatricula(jso.getString("matricula"));
+			riderr.setMatricula(jso.getString(this.matricula ));
 			riderr.setTipovehiculo(jso.getString("tipovehiculo"));
 			this.riderDAO.save(riderr);
 		} else {
-			Admin admin = new Admin();
-			admin.setCorreo(jso.getString(this.correo));
-			admin.setZona(jso.getString("zona"));
-			this.adminDAO.save(admin);
+			Admin adminn = new Admin();
+			adminn.setCorreo(jso.getString(this.correo));
+			adminn.setZona(jso.getString("zona"));
+			this.adminDAO.save(adminn);
 		}
 		this.userDAO.save(user);
 		return rol + " creado correctamente";
@@ -134,9 +143,9 @@ public class UserService {
 		User user = new User();
 		user.setCorreo(jso.getString(this.correo));
 		user.setPassword(jso.getString("pwd1"));
-		user.setApellidos(jso.getString("apellidos"));
+		user.setApellidos(jso.getString(this.apellidos));
 		user.setNif(jso.getString("nif"));
-		user.setNombre(jso.getString("nombre"));
+		user.setNombre(jso.getString(this.nombre));
 		return user;
 	}
 
@@ -157,60 +166,86 @@ public class UserService {
 		return "Usuario eliminado correctamente";
 	}
 
-	public User actualizarUsuario(String correo,JSONObject json) {
+	public boolean actualizarUsuario(String correo,JSONObject json) {
+		if (this.actualizarUser(correo, json)) {
+			if (json.getString("rol").equals(this.admin)) {
+				Admin adminn = this.adminDAO.findByCorreo(correo);
+				adminn.setZona(json.getString("zona"));
+			}else if (json.getString("rol").equals(this.rider)) {
+				Rider riderr = this.riderDAO.findByCorreo(correo);
+				riderr.setCarnet(Boolean.valueOf(json.getString(this.carnet)));
+				riderr.setMatricula(json.getString(this.matricula));
+				riderr.setTipovehiculo(json.getString("tipoVehiculo"));
+			}else {
+				this.actualizarCli(correo, json);
+			}
+			return true;
+		}
+		return false;
+	}
 
+	public boolean actualizarCliente(String correo, JSONObject json) {
+		if (this.actualizarUser(correo, json)) {
+			this.actualizarCli(correo, json);
+			return true;
+		}
+		return false;
+	}
+
+	public void actualizarCli(String correo, JSONObject json) {
+		Client clientt = this.clientDAO.findByCorreo(correo);
+		clientt.setDireccion(json.getString(this.direccion));
+		clientt.setTelefono(json.getString(this.telefono));
+		this.clientDAO.deleteByCorreo(correo);
+		this.clientDAO.save(clientt);
+	}
+
+	public boolean actualizarUser(String correo, JSONObject json) {
 		User nuevo = this.userDAO.findByCorreo(correo);
 		if (nuevo!=null) {
-			nuevo.setCorreo(json.getString("correo"));
-			nuevo.setPassword(json.getString("password"));
-			nuevo.setNombre(json.getString("nombre"));
-			nuevo.setApellidos(json.getString("apellidos"));
-			nuevo.setNif(json.getString("nif"));
+			nuevo.setPassword(json.getString(this.password));
+			nuevo.setNombre(json.getString(this.nombre));
+			nuevo.setApellidos(json.getString(this.apellidos));
 			nuevo.setRol(json.getString("rol"));
 			this.userDAO.deleteByCorreo(correo);
 			this.userDAO.save(nuevo);
-
-			return nuevo;
-		}else 
-			return nuevo;
+			return true;
+		} return false;
 	}
 
 	public JSONObject userRider(Rider rid) {
 		User user = this.userDAO.findByCorreo(rid.getCorreo());
 		JSONObject jso = new JSONObject();
-		jso.put("nombre", user.getNombre());
-		jso.put("contraseña", user.getPassword());
-		jso.put("apellidos", user.getApellidos());
-		jso.put(this.correo, correo);
+		jso.put(this.nombre, user.getNombre());
+		jso.put(this.password, user.getPassword());
+		jso.put(this.apellidos, user.getApellidos());
+		jso.put(this.correo, rid.getCorreo());
 		jso.put("tipoVehiculo", rid.getTipovehiculo());
 		jso.put("nif", user.getNif());
-		jso.put("carnet", rid.isCarnet());
-		jso.put("matricula", rid.getMatricula());
+		jso.put(this.carnet, rid.isCarnet());
+		jso.put(this.matricula, rid.getMatricula());
 		return jso;	
 	}
 
 	public String userRiders(List<Rider> list) {
-		String riders = "";
+		StringBuilder bld = new StringBuilder();
 		for (int i = 0; i<list.size(); i++) {
 			Rider rid = list.get(i);
 			JSONObject jso = this.userRider(rid);
 			if (i == list.size() - 1)
-				riders = riders + jso.toString();
+				bld.append(jso.toString());
 			else
-				riders = riders + jso.toString() + ";";
+				bld.append(jso.toString() + ";");
 		}
-		riders = riders.replace(" ", "");
-		riders = riders.replace("[", "");
-		riders = riders.replace("]", "");
-		return riders;
+		return bld.toString().replace(" ", "");
 	}
 
 	public JSONObject userAdmin(Admin admin) {
 		User user = this.userDAO.findByCorreo(admin.getCorreo());
 		JSONObject jso = new JSONObject();
-		jso.put("nombre", user.getNombre());
-		jso.put("contraseña", user.getPassword());
-		jso.put("apellidos", user.getApellidos());
+		jso.put(this.nombre, user.getNombre());
+		jso.put(this.password, user.getPassword());
+		jso.put(this.apellidos, user.getApellidos());
 		jso.put(this.correo, correo);
 		jso.put("nif", user.getNif());
 		jso.put("zona",admin.getZona());
@@ -218,48 +253,42 @@ public class UserService {
 	}
 
 	public String userAdmins(List<Admin> list) {
-		String admins = "";
+		StringBuilder bld = new StringBuilder();
 		for (int i = 0; i<list.size(); i++) {
-			Admin admin = list.get(i);
-			JSONObject jso = this.userAdmin(admin);
+			Admin adminn = list.get(i);
+			JSONObject jso = this.userAdmin(adminn);
 			if (i == list.size() - 1)
-				admins = admins + jso.toString();
+				bld.append(jso.toString());
 			else
-				admins = admins + jso.toString() + ";";
+				bld.append(jso.toString() + ";");
 		}
-		admins = admins.replace(" ", "");
-		admins = admins.replace("[", "");
-		admins = admins.replace("]", "");
-		return admins;
+		return bld.toString().replace(" ", "");
 	}
 
 	public JSONObject userClient(Client client) {
 		User user = this.userDAO.findByCorreo(client.getCorreo());
 		JSONObject jso = new JSONObject();
-		jso.put("nombre", user.getNombre());
-		jso.put("contraseña", user.getPassword());
-		jso.put("apellidos", user.getApellidos());
+		jso.put(this.nombre, user.getNombre());
+		jso.put(this.password, user.getPassword());
+		jso.put(this.apellidos, user.getApellidos());
 		jso.put(this.correo, correo);
 		jso.put("nif", user.getNif());
-		jso.put("direccion", client.getDireccion());
-		jso.put("telefono", client.getTelefono());
+		jso.put(this.direccion, client.getDireccion());
+		jso.put(this.telefono, client.getTelefono());
 		return jso;    
 	}
 
 	public String userClients(List<Client> list) {
-		String clients = "";
+		StringBuilder bld = new StringBuilder();
 		for (int i = 0; i<list.size(); i++) {
 			Client clientt= list.get(i);
 			JSONObject jso = this.userClient(clientt);
 			if (i == list.size() - 1)
-				clients = clients + jso.toString();
+				bld.append(jso.toString());
 			else
-				clients = clients + jso.toString() + ";";
+				bld.append(jso.toString() + ";");
 		}
-		clients = clients.replace(" ", "");
-		clients = clients.replace("[", "");
-		clients = clients.replace("]", "");
-		return clients;
+		return bld.toString().replace(" ", "");
 	}
 
 	public List<Rider> consultarRiders(){
@@ -273,5 +302,6 @@ public class UserService {
 	public List<Client> consultarClients(){
 		return this.clientDAO.findAll();
 	}
+
 }
 
