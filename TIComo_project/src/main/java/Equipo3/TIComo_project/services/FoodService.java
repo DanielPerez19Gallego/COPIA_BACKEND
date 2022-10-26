@@ -104,7 +104,7 @@ public class FoodService {
 	}
 	
 	public boolean existePlatoenRestaurante(String nombreP, String nombreR) {
-		List<Plate> platos = this.platoDAO.findByNombreAndRestaurante(nombreP, nombreR);
+		List<Plate> platos = this.platoDAO.findByNombreAndnombreRestaurante(nombreP, nombreR);
 		return !platos.isEmpty();
 	}
 	
@@ -121,7 +121,7 @@ public class FoodService {
 		String nombreViejo = jso.getString("nombreViejo");
 		String nombreNuevo = jso.getString(this.nombre);
 		String nombreRestaurante = jso.getString("nombreRestaurante");
-		Plate plato = this.platoDAO.findPlato(nombreViejo, nombreRestaurante);
+		Plate plato = this.platoDAO.findByNombreAndnombreRestaurante(nombreViejo, nombreRestaurante).get(0);
 		
 		if (plato == null)
 			return "noexiste";
@@ -130,7 +130,7 @@ public class FoodService {
 		
 		plato = this.crearPlatoAux(jso, plato);
 		
-		this.platoDAO.deletePlato(nombreViejo, nombreRestaurante);
+		this.platoDAO.deleteByNombreAndnombreRestaurante(nombreViejo, nombreRestaurante);
 		this.platoDAO.save(plato);
 		
 		return "Plato actualizado correctamente";
