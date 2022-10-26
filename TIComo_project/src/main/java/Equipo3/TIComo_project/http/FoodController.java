@@ -110,6 +110,8 @@ public class FoodController {
 			JSONObject jso = new JSONObject(info);	
 			String response = this.foodService.actualizarPlato(jso);
 			if (response.equals(this.nombre))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un plato con ese nombre");
+			else if (response.equals("noexiste"))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un plato con ese nombre");
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);

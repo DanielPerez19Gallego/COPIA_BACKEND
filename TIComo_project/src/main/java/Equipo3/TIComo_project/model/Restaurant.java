@@ -13,7 +13,6 @@ public class Restaurant {
 	private String telefono;
 	private String email;
 	private String categoria;
-	//private String valoracion;
 	
 	public String getNombre() {
 		return nombre;

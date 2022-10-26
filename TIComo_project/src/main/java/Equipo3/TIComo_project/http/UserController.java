@@ -21,7 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
 import Equipo3.TIComo_project.model.Admin;
 import Equipo3.TIComo_project.model.Client;
 import Equipo3.TIComo_project.model.Rider;
-import Equipo3.TIComo_project.model.User;
 import Equipo3.TIComo_project.services.UserService;
 
 
@@ -34,6 +33,12 @@ public class UserController {
 
 	private String correo = "correo";
 
+	private String sinAcceso = "No tienes acceso a este servicio"; 
+	
+	private String noExiste = "No existe ningun usuario en la base de datos";
+	
+	private String admin = "admin";
+
 	@PostMapping("/login")
 	public ResponseEntity<String> login(HttpSession session, @RequestBody Map<String, Object> info) {
 		try {
@@ -43,8 +48,8 @@ public class UserController {
 			if (response.equals("nulo"))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario o password desconocidas");
 			else {
-				session.setAttribute(this.correo, jso.getString(this.correo));
-				return new ResponseEntity<>("Inicio de sesion correcto como "+ response, HttpStatus.OK);
+				session.setAttribute("rol", response);
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -52,6 +57,8 @@ public class UserController {
 	}
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody Map<String, Object> info, HttpSession session) {
+		if (!session.getAttribute("rol").equals(("client")))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
 			String response = "";
@@ -73,6 +80,8 @@ public class UserController {
 
 	@PostMapping("/crearUsuario")
 	public ResponseEntity<String> crearUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+		if (!session.getAttribute("rol").equals((this.admin)))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
 			String pwd1 = jso.getString("pwd1");
@@ -99,13 +108,15 @@ public class UserController {
 
 	@PostMapping("/eliminarUsuario")
 	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+		if (!session.getAttribute("rol").equals((this.admin)))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
 			String correoUsuario = jso.getString(this.correo);
 			String response = this.userService.eliminarUsuario(correoUsuario);
 
 			if (response.equals(this.correo))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un usuario con ese correo");
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -115,30 +126,42 @@ public class UserController {
 	}
 
 	@PutMapping("/actualizarUsuario/{correo}")
-	public ResponseEntity<String> actualizarUsuario(@PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
+	public ResponseEntity<String> actualizarUsuario( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
+		if (!session.getAttribute("rol").equals((this.admin)))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+		boolean userUpdate = false;
 		JSONObject json = new JSONObject(info);
-		User userNuevo= this.userService.actualizarUsuario(correo,json);
-		if (userNuevo != null) {
-			JSONObject jsonNuevo = new JSONObject(); 
-			jsonNuevo.put("correo", userNuevo.getCorreo());
-			jsonNuevo.put("password", userNuevo.getPassword());
-			jsonNuevo.put("nombre", userNuevo.getNombre());
-			jsonNuevo.put("apellidos", userNuevo.getApellidos());
-			jsonNuevo.put("nif", userNuevo.getNif());
-			jsonNuevo.put("rol", userNuevo.getRol());
-			return new ResponseEntity<>(jsonNuevo+"Usuario actualizado", HttpStatus.OK); //Mando el user en json
+		userUpdate= this.userService.actualizarUsuario(correo,json);
+		if (userUpdate) {
+			return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
 		}else {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ese usuario en la base de datos");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
+		}
+	}
+	
+	@PutMapping("/actualizarCliente/{correo}")
+	public ResponseEntity<String> actualizarCliente( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
+		if (!session.getAttribute("rol").equals(("client")))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+		boolean userUpdate = false;
+		JSONObject json = new JSONObject(info);
+		userUpdate= this.userService.actualizarCliente(correo,json);
+		if (userUpdate) {
+			return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
+		}else {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
 		}
 	}
 
 	@GetMapping("/getRiders")
-	public ResponseEntity<String> consultarRiders() {
+	public ResponseEntity<String> consultarRiders(HttpSession session) {
+		if (!session.getAttribute("rol").equals((this.admin)))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Rider> listaResponse;
 		try {
 			listaResponse = this.userService.consultarRiders();  //Recojo la lista en una variable.
 			if(listaResponse.isEmpty()) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ningun usuario en la base de datos");
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
 			}else {
 				return new ResponseEntity<>(this.userService.userRiders(listaResponse), HttpStatus.OK);
 			}
@@ -148,12 +171,14 @@ public class UserController {
 	}
 
 	@GetMapping("/getAdmins")
-	public ResponseEntity<String> consultarAdmins() {
+	public ResponseEntity<String> consultarAdmins(HttpSession session) {
+		if (!session.getAttribute("rol").equals((this.admin)))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Admin> listaResponse;
 		try {
 			listaResponse = this.userService.consultarAdmins();  //Recojo la lista en una variable.
 			if(listaResponse.isEmpty()) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ningun usuario en la base de datos");
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
 			}else {
 				return new ResponseEntity<>(this.userService.userAdmins(listaResponse), HttpStatus.OK);
 			}
@@ -163,12 +188,14 @@ public class UserController {
 	}
 
 	@GetMapping("/getClients")
-	public ResponseEntity<String> consultarClients() {
+	public ResponseEntity<String> consultarClients(HttpSession session) {
+		if (!session.getAttribute("rol").equals((this.admin)))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Client> listaResponse;
 		try {
 			listaResponse = this.userService.consultarClients();  //Recojo la lista en una variable.
 			if(listaResponse.isEmpty()) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe ningun usuario en la base de datos");
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
 			}else {
 				return new ResponseEntity<>(this.userService.userClients(listaResponse), HttpStatus.OK);
 			}
@@ -176,5 +203,10 @@ public class UserController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
+	}
+	
+	@GetMapping("/logout")
+	public void cerrarSesion(HttpSession session) {
+		session.invalidate();
 	}
 }
