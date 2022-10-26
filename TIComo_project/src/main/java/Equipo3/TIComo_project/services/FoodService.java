@@ -98,22 +98,19 @@ public class FoodService {
 	}
 
 	public String consultarRestaurantes() {
+		StringBuilder bld = new StringBuilder();
 		List <Restaurant> restaurantes = this.restDAO.findAll();
-		String response = "";
 		if (!restaurantes.isEmpty()) {
 			for (int i=0; i<restaurantes.size(); i++) {
 				Restaurant res = restaurantes.get(i);
 				JSONObject resJSO = res.toJSON();
 				if (i == restaurantes.size() - 1)
-					response = response + resJSO.toString();
+					bld.append(resJSO.toString());
 				else
-					response = response + resJSO.toString() + ";";
+					bld.append(resJSO.toString() + ";");
 			}
-			response = response.replace(" ", "");
-			response = response.replace("[", "");
-			response = response.replace("]", "");
 		}
-		return response;
+		return bld.toString().replace(" ", "");
 	}
 
 	public String eliminarCarta(String nombreRes) {
@@ -153,22 +150,19 @@ public class FoodService {
 	}
 
 	public String platosParaEnviar(String nombreRestaurante) {
-		String listPlatos = "";
+		StringBuilder bld = new StringBuilder();
 		List<Plate> listaPlatos = this.platoDAO.findBynombreRestaurante(nombreRestaurante);
 		if(!listaPlatos.isEmpty()) {
 			for (int i = 0; i<listaPlatos.size(); i++) {
 				Plate plato= listaPlatos.get(i);
 				JSONObject jso = plato.toJSON();
 				if (i == listaPlatos.size() - 1)
-					listPlatos = listPlatos + jso.toString();
+					bld.append(jso.toString());
 				else
-					listPlatos = listPlatos + jso.toString() + ";";
+					bld.append(jso.toString() + ";");
 			}
-			listPlatos = listPlatos.replace(" ", "");
-			listPlatos = listPlatos.replace("[", "");
-			listPlatos = listPlatos.replace("]", "");
 		}
-		return listPlatos;
+		return bld.toString();
 	}
 
 }
