@@ -22,6 +22,9 @@ public class FoodService {
 
 	private String nombre = "nombre";
 
+	@Autowired
+	private SecurityService secService;
+	
 	public String crearRestaurante(JSONObject jso) {
 
 		Restaurant resNombre = this.restDAO.findByNombre(jso.getString(this.nombre));
@@ -56,7 +59,7 @@ public class FoodService {
 
 	public Restaurant crearRestAux(JSONObject jso, Restaurant res) {
 		res.setCategoria(jso.getString("categoria"));
-		res.setCif(jso.getString("cif"));
+		res.setCif(this.secService.encriptar(jso.getString("cif")));
 		res.setDireccion(jso.getString("direccion"));
 		res.setEmail(jso.getString("email"));
 		res.setRazonSocial(jso.getString("razonSocial"));
@@ -71,6 +74,8 @@ public class FoodService {
 			for (int i=0; i<restaurantes.size(); i++) {
 				Restaurant res = restaurantes.get(i);
 				JSONObject resJSO = res.toJSON();
+				String cifEnc = resJSO.getString("cif");
+				resJSO.put("cif", this.secService.desencriptar(cifEnc));
 				if (i == restaurantes.size() - 1)
 					bld.append(resJSO.toString());
 				else
