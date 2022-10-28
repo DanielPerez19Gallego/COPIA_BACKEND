@@ -29,26 +29,26 @@ public class FoodService {
 			return this.nombre;
 		Restaurant res = new Restaurant();
 		res = this.crearRestAux(jso, res);
+		res.setNombre(jso.getString(this.nombre));
 		this.restDAO.save(res);
 		return "Restaurante creado correctamente";
 	}
 
 	public String eliminarRestaurante(String nombreRes) {
 		Restaurant res = this.restDAO.findByNombre(nombreRes);
-		if (res != null) {
-			this.platoDAO.deleteBynombreRestaurante(nombreRes);
-		}else return this.nombre;
-
+		if (res == null) 
+			return this.nombre;
+		this.platoDAO.deleteByNombreRestaurante(nombreRes);
 		this.restDAO.deleteByNombre(nombreRes);
 		return "Restaurante eliminado correctamente";
 	}
 
 	public String actualizarRestaurante(JSONObject jso) {
-		String nombreViejo = jso.getString("nombreViejo");
-		Restaurant res = this.restDAO.findByNombre(nombreViejo);
+		String nombree = jso.getString("nombre");
+		Restaurant res = this.restDAO.findByNombre(nombree);
 		if (res == null) 
 			return this.nombre;
-		this.restDAO.deleteByNombre(nombreViejo);
+		this.restDAO.deleteByNombre(nombree);
 		res = this.crearRestAux(jso, res);
 		this.restDAO.save(res);
 		return "Restaurante actualizado correctamente";
@@ -59,7 +59,6 @@ public class FoodService {
 		res.setCif(jso.getString("cif"));
 		res.setDireccion(jso.getString("direccion"));
 		res.setEmail(jso.getString("email"));
-		res.setNombre(jso.getString(this.nombre));
 		res.setRazonSocial(jso.getString("razonSocial"));
 		res.setTelefono(jso.getString("telefono"));
 		return res;
@@ -86,7 +85,7 @@ public class FoodService {
 		Restaurant res = this.restDAO.findByNombre(nombreRes);
 		if (res == null)
 			return this.nombre;
-		this.platoDAO.deleteBynombreRestaurante(nombreRes);
+		this.platoDAO.deleteByNombreRestaurante(nombreRes);
 		return "Carta eliminada correctamente";
 
 	}
@@ -104,8 +103,9 @@ public class FoodService {
 	}
 	
 	public boolean existePlatoenRestaurante(String nombreP, String nombreR) {
-		List<Plate> platos = this.platoDAO.findByNombreAndnombreRestaurante(nombreP, nombreR);
+		List <Plate> platos = this.platoDAO.findByNombreAndNombreRestaurante(nombreP, nombreR);
 		return !platos.isEmpty();
+			
 	}
 	
 	public Plate crearPlatoAux(JSONObject jso, Plate pla) {
@@ -121,24 +121,23 @@ public class FoodService {
 		String nombreViejo = jso.getString("nombreViejo");
 		String nombreNuevo = jso.getString(this.nombre);
 		String nombreRestaurante = jso.getString("nombreRestaurante");
-		Plate plato = this.platoDAO.findByNombreAndnombreRestaurante(nombreViejo, nombreRestaurante).get(0);
-		
-		if (plato == null)
+		List <Plate> plato = this.platoDAO.findByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);
+		if (plato.isEmpty())
 			return "noexiste";
 		if (this.existePlatoenRestaurante(nombreNuevo, nombreRestaurante)) 
 			return this.nombre;
 		
-		plato = this.crearPlatoAux(jso, plato);
+		Plate platt = this.crearPlatoAux(jso, plato.get(0));
 		
-		this.platoDAO.deleteByNombreAndnombreRestaurante(nombreViejo, nombreRestaurante);
-		this.platoDAO.save(plato);
+		this.platoDAO.deleteByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);
+		this.platoDAO.save(platt);
 		
 		return "Plato actualizado correctamente";
 	}
 
 	public String platosParaEnviar(String nombreRestaurante) {
 		StringBuilder bld = new StringBuilder();
-		List<Plate> listaPlatos = this.platoDAO.findBynombreRestaurante(nombreRestaurante);
+		List<Plate> listaPlatos = this.platoDAO.findByNombreRestaurante(nombreRestaurante);
 		if(!listaPlatos.isEmpty()) {
 			for (int i = 0; i<listaPlatos.size(); i++) {
 				Plate plato= listaPlatos.get(i);
