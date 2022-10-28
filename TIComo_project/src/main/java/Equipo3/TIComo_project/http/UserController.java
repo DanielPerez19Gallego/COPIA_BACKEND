@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import Equipo3.TIComo_project.model.Admin;
 import Equipo3.TIComo_project.model.Client;
 import Equipo3.TIComo_project.model.Rider;
+import Equipo3.TIComo_project.services.SecurityService;
 import Equipo3.TIComo_project.services.UserService;
 
 
@@ -30,17 +32,19 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private SecurityService secService;
 
 	private String correo = "correo";
 
 	private String sinAcceso = "No tienes acceso a este servicio"; 
-	
-	private String noExiste = "No existe ningun usuario en la base de datos";
-	
-	private String admin = "admin";
 
+	private String noExiste = "No existe ningun usuario en la base de datos";
+
+	@CrossOrigin
 	@PostMapping("/login")
-	public ResponseEntity<String> login(HttpSession session, @RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> login(HttpSession session , @RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			String response = this.userService.login(jso);
@@ -49,20 +53,24 @@ public class UserController {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario o password desconocidas");
 			else {
 				session.setAttribute("rol", response);
+				session.setAttribute("correo", jso.getString(this.correo));
+				session.setAttribute("password", jso.getString("password"));
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+	
+	@CrossOrigin
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody Map<String, Object> info, HttpSession session) {
-		if (!session.getAttribute("rol").equals(("client")))
+		if (!this.secService.accesoCliente(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
 			String response = "";
-			String [] comprobar = this.userService.comprobarPassword(jso);
+			String [] comprobar = this.secService.comprobarPassword(jso);
 			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
 				response = this.userService.register(jso);
 			else
@@ -78,9 +86,10 @@ public class UserController {
 		}
 	}
 
+	@CrossOrigin
 	@PostMapping("/crearUsuario")
 	public ResponseEntity<String> crearUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
-		if (!session.getAttribute("rol").equals((this.admin)))
+		if (!this.secService.accesoAdmin(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
@@ -106,9 +115,10 @@ public class UserController {
 		}
 	}
 
+	@CrossOrigin
 	@PostMapping("/eliminarUsuario")
 	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
-		if (!session.getAttribute("rol").equals((this.admin)))
+		if (!this.secService.accesoAdmin(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
@@ -125,9 +135,10 @@ public class UserController {
 		}
 	}
 
+	@CrossOrigin
 	@PutMapping("/actualizarUsuario/{correo}")
 	public ResponseEntity<String> actualizarUsuario( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
-		if (!session.getAttribute("rol").equals((this.admin)))
+		if (!this.secService.accesoAdmin(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		boolean userUpdate = false;
 		JSONObject json = new JSONObject(info);
@@ -138,10 +149,11 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
 		}
 	}
-	
+
+	@CrossOrigin
 	@PutMapping("/actualizarCliente/{correo}")
 	public ResponseEntity<String> actualizarCliente( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
-		if (!session.getAttribute("rol").equals(("client")))
+		if (!this.secService.accesoCliente(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		boolean userUpdate = false;
 		JSONObject json = new JSONObject(info);
@@ -153,9 +165,10 @@ public class UserController {
 		}
 	}
 
+	@CrossOrigin
 	@GetMapping("/getRiders")
 	public ResponseEntity<String> consultarRiders(HttpSession session) {
-		if (!session.getAttribute("rol").equals((this.admin)))
+		if (!this.secService.accesoAdmin(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Rider> listaResponse;
 		try {
@@ -170,9 +183,10 @@ public class UserController {
 		}
 	}
 
+	@CrossOrigin
 	@GetMapping("/getAdmins")
 	public ResponseEntity<String> consultarAdmins(HttpSession session) {
-		if (!session.getAttribute("rol").equals((this.admin)))
+		if (!this.secService.accesoAdmin(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Admin> listaResponse;
 		try {
@@ -187,9 +201,10 @@ public class UserController {
 		}
 	}
 
+	@CrossOrigin
 	@GetMapping("/getClients")
 	public ResponseEntity<String> consultarClients(HttpSession session) {
-		if (!session.getAttribute("rol").equals((this.admin)))
+		if (!this.secService.accesoAdmin(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Client> listaResponse;
 		try {
@@ -204,7 +219,8 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
-	
+
+	@CrossOrigin
 	@GetMapping("/logout")
 	public void cerrarSesion(HttpSession session) {
 		session.invalidate();

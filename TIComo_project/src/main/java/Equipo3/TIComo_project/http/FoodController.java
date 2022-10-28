@@ -2,10 +2,13 @@ package Equipo3.TIComo_project.http;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import Equipo3.TIComo_project.services.FoodService;
+import Equipo3.TIComo_project.services.SecurityService;
 
 @RestController
 @RequestMapping("food")
@@ -22,11 +26,19 @@ public class FoodController {
 
 	@Autowired
 	private FoodService foodService;
+	
+	@Autowired
+	private SecurityService secService;
 
 	private String nombre = "nombre";
 
+	private String sinAcceso = "No tienes acceso a este servicio";
+
+	@CrossOrigin
 	@PostMapping("/crearRestaurante")
-	public ResponseEntity<String> crearRestaurante(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> crearRestaurante(@RequestBody Map<String, Object> info, HttpSession session) {
+		if (!this.secService.accesoAdmin(session))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
 			String response = this.foodService.crearRestaurante(jso);
@@ -41,8 +53,11 @@ public class FoodController {
 		}
 	}
 
+	@CrossOrigin
 	@PostMapping("/eliminarRestaurante")
-	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
+		if (!this.secService.accesoAdmin(session))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
 			String nombreRes = jso.getString(this.nombre);
@@ -58,10 +73,11 @@ public class FoodController {
 		}
 	}
 
-	
-
+	@CrossOrigin
 	@PostMapping("/actualizarRestaurante")
-	public ResponseEntity<String> actualizarRestaurante(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> actualizarRestaurante(@RequestBody Map<String, Object> info, HttpSession session) {
+		if (!this.secService.accesoAdmin(session))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);	
 			String response = this.foodService.actualizarRestaurante(jso);
@@ -75,6 +91,7 @@ public class FoodController {
 		}
 	}
 
+	@CrossOrigin
 	@GetMapping("/consultarRestaurantes")
 	public ResponseEntity<String> consultarRestaurantes() {
 		try {	
@@ -89,8 +106,11 @@ public class FoodController {
 		}
 	}
 
+	@CrossOrigin
 	@PostMapping("/crearPlato")
-	public ResponseEntity<String> crearPlato(@RequestBody Map<String, Object> info){
+	public ResponseEntity<String> crearPlato(@RequestBody Map<String, Object> info, HttpSession session){
+		if (!this.secService.accesoAdmin(session))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);    
 			String response = this.foodService.crearPlato(jso);
@@ -104,8 +124,11 @@ public class FoodController {
 		}
 	}
 	
+	@CrossOrigin
 	@PostMapping("/actualizarPlato")
-	public ResponseEntity<String> actualizarPlato(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> actualizarPlato(@RequestBody Map<String, Object> info, HttpSession session) {
+		if (!this.secService.accesoAdmin(session))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);	
 			String response = this.foodService.actualizarPlato(jso);
@@ -121,6 +144,7 @@ public class FoodController {
 		}
 	}
 
+	@CrossOrigin
 	@GetMapping("/getCarta/{nombreRestaurante}")
 	public ResponseEntity <String> consultarCarta(@PathVariable String nombreRestaurante){//Nombre de restaurantes y me devuelve un array de platos en formato String.
 		try {
@@ -134,8 +158,11 @@ public class FoodController {
 		}
 	}
 
+	@CrossOrigin
 	@PostMapping("/eliminarCarta/{restaurante}")
-	public ResponseEntity<String> eliminarCarta(@PathVariable String restaurante) {
+	public ResponseEntity<String> eliminarCarta(@PathVariable String restaurante, HttpSession session) {
+		if (!this.secService.accesoAdmin(session))
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			String response = this.foodService.eliminarCarta(restaurante);
 

@@ -43,37 +43,6 @@ public class UserService {
 	private String password = "contraseña";
 
 
-	public String[] comprobarPassword(JSONObject info) {
-
-		String[] list = new String[2];
-
-		String pwd1 = info.getString("pwd1");
-		String pwd2 = info.getString("pwd2");
-		list[0] = "false";
-		if (!pwd1.equals(pwd2)) {
-			list[1] = "Las contraseñas tienen que ser iguales";
-		}
-		else {
-			if(pwd1.length() < 8) {
-				list[1] = "La contraseña debe tener al menos 8 caracteres";
-			}
-			else if (!pwd1.matches(".*[0-9].*")) {
-				list[1] = "La contraseña debe contener al menos un digito";
-			}
-			else if (pwd1.equals(pwd1.toLowerCase())) {
-				list[1] = "La contraseña debe tener al menos una mayúscula";
-			}
-			else if (pwd1.equals(pwd1.toUpperCase())) {
-				list[1] = "La contraseña debe tener al menos una minúscula";
-			}
-			else {
-				list[0] = "true";
-				list[1] = "OK";
-			}
-		}
-		return list;
-	}
-
 	public String login(JSONObject jso) {
 		String rol = "nulo";
 		User user = this.userDAO.findByCorreo(jso.getString(this.correo));
