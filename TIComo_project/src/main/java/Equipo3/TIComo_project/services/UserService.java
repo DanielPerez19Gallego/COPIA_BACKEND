@@ -42,13 +42,11 @@ public class UserService {
 	private String apellidos = "apellidos";
 	private String password = "contraseña";
 
-
-	public String login(JSONObject jso) {
+	public String login(JSONObject jso){
 		String rol = "nulo";
 		User user = this.userDAO.findByCorreo(jso.getString(this.correo));
 		if (user != null) {
-			String pwd = org.apache.commons.codec.digest.DigestUtils.sha512Hex(jso.getString("pwd"));
-			if (user.getPassword().equals(pwd)) {
+			if (user.getPassword().equals(jso.getString("pwd"))) {
 				if (user.getRol().equals(this.client))
 					rol = this.client;
 				else if (user.getRol().equals(this.admin))
@@ -79,7 +77,7 @@ public class UserService {
 		return "Registro completado";
 	}
 
-	public String crearUsuario(JSONObject jso) {
+	public String crearUsuario(JSONObject jso){
 
 		User userEmail = this.userDAO.findByCorreo(jso.getString(this.correo));
 		if (userEmail != null) 
@@ -107,7 +105,7 @@ public class UserService {
 		return rol + " creado correctamente";
 	}
 
-	public User crearUsuarioAux(JSONObject jso) {
+	public User crearUsuarioAux(JSONObject jso){
 
 		User user = new User();
 		user.setCorreo(jso.getString(this.correo));
@@ -135,7 +133,7 @@ public class UserService {
 		return "Usuario eliminado correctamente";
 	}
 
-	public boolean actualizarUsuario(String correo,JSONObject json) {
+	public boolean actualizarUsuario(String correo,JSONObject json){
 		if (this.actualizarUser(correo, json)) {
 			if (json.getString("rol").equals(this.admin)) {
 				Admin adminn = this.adminDAO.findByCorreo(correo);
@@ -153,7 +151,7 @@ public class UserService {
 		return false;
 	}
 
-	public boolean actualizarCliente(String correo, JSONObject json) {
+	public boolean actualizarCliente(String correo, JSONObject json){
 		if (this.actualizarUser(correo, json)) {
 			this.actualizarCli(correo, json);
 			return true;
@@ -169,7 +167,7 @@ public class UserService {
 		this.clientDAO.save(clientt);
 	}
 
-	public boolean actualizarUser(String correo, JSONObject json) {
+	public boolean actualizarUser(String correo, JSONObject json){
 		User nuevo = this.userDAO.findByCorreo(correo);
 		if (nuevo!=null) {
 			nuevo.setPassword(json.getString(this.password));
