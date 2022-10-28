@@ -8,12 +8,12 @@ import Equipo3.TIComo_project.model.Plate;
 public interface PlateRepository extends MongoRepository <Plate, String> {
 
 	@Query(value = "{ 'nombre' : ?0, 'nombreRestaurante' : ?1 }")
-	List<Plate> findByNombreAndnombreRestaurante(String nombre, String nombreRes);
+	List <Plate> findByNombreAndNombreRestaurante(String nombre, String nombreRestaurante);
 
 	@Query(value = "{ 'nombre' : ?0, 'nombreRestaurante' : ?1 }", delete=true)
-	void deleteByNombreAndnombreRestaurante(String nombrePlato, String nombreRestaurante);
+	void deleteByNombreAndNombreRestaurante(String nombrePlato, String nombreRestaurante);
 
-	List <Plate> findBynombreRestaurante(String nombreRes);
+	List <Plate> findByNombreRestaurante(String nombreRes);
 
-	void deleteBynombreRestaurante(String nombreRes);
+	void deleteByNombreRestaurante(String nombreRes);
 }
