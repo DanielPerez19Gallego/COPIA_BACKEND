@@ -1,10 +1,17 @@
 package Equipo3.TIComo_project.http;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,7 +61,7 @@ public class UserController {
 			else {
 				session.setAttribute("rol", response);
 				session.setAttribute("correo", jso.getString(this.correo));
-				session.setAttribute("password", jso.getString("password"));
+				session.setAttribute("password", jso.getString("pwd"));
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
@@ -93,17 +100,10 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			JSONObject jso = new JSONObject(info);
-			String pwd1 = jso.getString("pwd1");
-			String pwd2 = jso.getString("pwd2");
-
-			if (!pwd1.equals(pwd2))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas tienen que ser iguales");
-			else {
-				if(pwd1.length() < 8)
-					throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña tiene que tener minimo 8 caracteres");
-			}
-
-			String response = this.userService.crearUsuario(jso);
+			String response = "";
+			String [] comprobar = this.secService.comprobarPassword(jso);
+			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
+				response = this.userService.crearUsuario(jso);
 
 			if (response.equals(this.correo))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
@@ -137,7 +137,7 @@ public class UserController {
 
 	@CrossOrigin
 	@PutMapping("/actualizarUsuario/{correo}")
-	public ResponseEntity<String> actualizarUsuario( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
+	public ResponseEntity<String> actualizarUsuario( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, JSONException, InvalidKeyException{
 		if (!this.secService.accesoAdmin(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		boolean userUpdate = false;
@@ -152,7 +152,7 @@ public class UserController {
 
 	@CrossOrigin
 	@PutMapping("/actualizarCliente/{correo}")
-	public ResponseEntity<String> actualizarCliente( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
+	public ResponseEntity<String> actualizarCliente( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info) throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, JSONException{
 		if (!this.secService.accesoCliente(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		boolean userUpdate = false;
