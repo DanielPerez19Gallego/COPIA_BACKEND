@@ -51,7 +51,7 @@ public class UserService {
 		String rol = "nulo";
 		User user = this.userDAO.findByCorreo(jso.getString(this.correo));
 		if (user != null) {
-			if (user.getPassword().equals(jso.getString("pwd"))) {
+			if (this.secService.desencriptar(user.getPassword()).equals(jso.getString("pwd"))) {
 				if (user.getRol().equals(this.client))
 					rol = this.client;
 				else if (user.getRol().equals(this.admin))
@@ -116,7 +116,7 @@ public class UserService {
 		user.setCorreo(jso.getString(this.correo));
 		user.setPassword(this.secService.encriptar(jso.getString("pwd1")));
 		user.setApellidos(jso.getString(this.apellidos));
-		user.setNif(jso.getString("nif"));
+		user.setNif(this.secService.encriptar(jso.getString("nif")));
 		user.setNombre(jso.getString(this.nombre));
 		return user;
 	}
@@ -193,7 +193,7 @@ public class UserService {
 		jso.put(this.apellidos, user.getApellidos());
 		jso.put(this.correo, rid.getCorreo());
 		jso.put("tipoVehiculo", rid.getTipovehiculo());
-		jso.put("nif", user.getNif());
+		jso.put("nif", this.secService.desencriptar(user.getNif()));
 		jso.put(this.carnet, rid.isCarnet());
 		jso.put(this.matricula, rid.getMatricula());
 		return jso;	
@@ -216,10 +216,10 @@ public class UserService {
 		User user = this.userDAO.findByCorreo(admin.getCorreo());
 		JSONObject jso = new JSONObject();
 		jso.put(this.nombre, user.getNombre());
-		jso.put(this.password, user.getPassword());
+		jso.put(this.password, this.secService.desencriptar(user.getPassword()));
 		jso.put(this.apellidos, user.getApellidos());
 		jso.put(this.correo, correo);
-		jso.put("nif", user.getNif());
+		jso.put("nif", this.secService.desencriptar(user.getNif()));
 		jso.put("zona",admin.getZona());
 		return jso;    
 	}
@@ -241,10 +241,10 @@ public class UserService {
 		User user = this.userDAO.findByCorreo(client.getCorreo());
 		JSONObject jso = new JSONObject();
 		jso.put(this.nombre, user.getNombre());
-		jso.put(this.password, user.getPassword());
+		jso.put(this.password, this.secService.desencriptar(user.getPassword()));
 		jso.put(this.apellidos, user.getApellidos());
 		jso.put(this.correo, correo);
-		jso.put("nif", user.getNif());
+		jso.put("nif",this.secService.desencriptar(user.getNif()));
 		jso.put(this.direccion, client.getDireccion());
 		jso.put(this.telefono, client.getTelefono());
 		return jso;    
