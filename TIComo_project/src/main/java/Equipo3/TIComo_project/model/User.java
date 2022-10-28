@@ -1,17 +1,9 @@
 package Equipo3.TIComo_project.model;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import Equipo3.TIComo_project.services.SecurityService;
 
 @Document(collection="Users")
 public class User {
@@ -22,9 +14,9 @@ public class User {
 	private String apellidos;
 	private String nif;
 	private String rol;
-	
-	@Autowired
-	private SecurityService secService;
+
+
+
 
 	public String getRol() {
 		return rol;
@@ -43,21 +35,14 @@ public class User {
 	}
 
 	public String getPassword(){
-		try {
-			return this.secService.desencriptar(password);
-		} catch (InvalidKeyException | UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException
-				| IllegalBlockSizeException | BadPaddingException e) {
-			return "";
-		}
+		return this.password;
+
 	}
 
 	public void setPassword(String password){
-		try {
-			this.password = this.secService.encriptar(password);
-		} catch (InvalidKeyException | UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException
-				| IllegalBlockSizeException | BadPaddingException e) {
-			this.password = "";
-		}
+
+		this.password = password;
+
 	}
 
 	public String getNombre() {
@@ -75,11 +60,11 @@ public class User {
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
 	}
-	
+
 	public String getNif() {
 		return nif;
 	}
-	
+
 	public void setNif(String nif) {
 		this.nif = org.apache.commons.codec.digest.DigestUtils.sha256Hex(nif);
 	}
