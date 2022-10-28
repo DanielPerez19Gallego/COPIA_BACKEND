@@ -1,7 +1,5 @@
 package Equipo3.TIComo_project.model;
 
-
-
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
@@ -14,9 +12,6 @@ public class User {
 	private String apellidos;
 	private String nif;
 	private String rol;
-
-
-
 
 	public String getRol() {
 		return rol;
@@ -66,6 +61,6 @@ public class User {
 	}
 
 	public void setNif(String nif) {
-		this.nif = org.apache.commons.codec.digest.DigestUtils.sha256Hex(nif);
+		this.nif = nif;
 	}
 }
