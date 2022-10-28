@@ -1,7 +1,13 @@
 package Equipo3.TIComo_project.http;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
@@ -36,7 +42,7 @@ public class FoodController {
 
 	@CrossOrigin
 	@PostMapping("/crearRestaurante")
-	public ResponseEntity<String> crearRestaurante(@RequestBody Map<String, Object> info, HttpSession session) {
+	public ResponseEntity<String> crearRestaurante(@RequestBody Map<String, Object> info, HttpSession session) throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 		if (!this.secService.accesoAdmin(session))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
@@ -96,11 +102,7 @@ public class FoodController {
 	public ResponseEntity<String> consultarRestaurantes() {
 		try {	
 			String response = this.foodService.consultarRestaurantes();
-			if (response.length() == 0)
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existen restaurantes");
-			else {
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
