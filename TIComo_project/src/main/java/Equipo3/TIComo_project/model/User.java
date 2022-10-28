@@ -56,7 +56,7 @@ public class User {
 			this.password = this.secService.encriptar(password);
 		} catch (InvalidKeyException | UnsupportedEncodingException | NoSuchAlgorithmException | NoSuchPaddingException
 				| IllegalBlockSizeException | BadPaddingException e) {
-			e.printStackTrace();
+			this.password = "";
 		}
 	}
 
