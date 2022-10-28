@@ -15,6 +15,7 @@ import Equipo3.TIComo_project.dao.AdminRepository;
 import Equipo3.TIComo_project.dao.ClientRepository;
 import Equipo3.TIComo_project.dao.RiderRepository;
 
+
 @Service
 public class UserService {
 
@@ -42,6 +43,10 @@ public class UserService {
 	private String apellidos = "apellidos";
 	private String password = "contraseña";
 
+	@Autowired
+	private SecurityService secService;
+	
+	
 	public String login(JSONObject jso){
 		String rol = "nulo";
 		User user = this.userDAO.findByCorreo(jso.getString(this.correo));
@@ -109,7 +114,7 @@ public class UserService {
 
 		User user = new User();
 		user.setCorreo(jso.getString(this.correo));
-		user.setPassword(jso.getString("pwd1"));
+		user.setPassword(this.secService.encriptar(jso.getString("pwd1")));
 		user.setApellidos(jso.getString(this.apellidos));
 		user.setNif(jso.getString("nif"));
 		user.setNombre(jso.getString(this.nombre));
@@ -184,7 +189,7 @@ public class UserService {
 		User user = this.userDAO.findByCorreo(rid.getCorreo());
 		JSONObject jso = new JSONObject();
 		jso.put(this.nombre, user.getNombre());
-		jso.put(this.password, user.getPassword());
+		jso.put(this.password, this.secService.desencriptar(user.getPassword()));
 		jso.put(this.apellidos, user.getApellidos());
 		jso.put(this.correo, rid.getCorreo());
 		jso.put("tipoVehiculo", rid.getTipovehiculo());
