@@ -134,7 +134,7 @@ class TiComoProjectApplicationTests {
 	
 	}
 	void registroConSinEliminacionTest() throws JSONException {
-
+		//CrearUsuarioCliente
 		JSONObject registro = new JSONObject();
 		registro.put("correo", "daniprueba5@gmail");
 		registro.put("pwd1", "Clientclient2");
