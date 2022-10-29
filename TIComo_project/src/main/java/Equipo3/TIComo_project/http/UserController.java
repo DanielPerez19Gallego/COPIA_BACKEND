@@ -174,7 +174,7 @@ public class UserController {
 		try {
 			listaResponse = this.userService.consultarRiders();  //Recojo la lista en una variable.
 			if(listaResponse.isEmpty()) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
+				return new ResponseEntity<>("", HttpStatus.OK);
 			}else {
 				return new ResponseEntity<>(this.userService.userRiders(listaResponse), HttpStatus.OK);
 			}
@@ -192,7 +192,7 @@ public class UserController {
 		try {
 			listaResponse = this.userService.consultarAdmins();  //Recojo la lista en una variable.
 			if(listaResponse.isEmpty()) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
+				return new ResponseEntity<>("", HttpStatus.OK);
 			}else {
 				return new ResponseEntity<>(this.userService.userAdmins(listaResponse), HttpStatus.OK);
 			}
@@ -210,7 +210,7 @@ public class UserController {
 		try {
 			listaResponse = this.userService.consultarClients();  //Recojo la lista en una variable.
 			if(listaResponse.isEmpty()) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
+				return new ResponseEntity<>("", HttpStatus.OK);
 			}else {
 				return new ResponseEntity<>(this.userService.userClients(listaResponse), HttpStatus.OK);
 			}
