@@ -30,7 +30,7 @@ public class Restaurant {
 		return cif;
 	}
 	public void setCif(String cif) {
-		this.cif = org.apache.commons.codec.digest.DigestUtils.sha256Hex(cif);
+		this.cif = cif;
 	}
 	public String getDireccion() {
 		return direccion;
