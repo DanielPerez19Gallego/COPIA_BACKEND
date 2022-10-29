@@ -151,9 +151,8 @@ public class FoodController {
 	public ResponseEntity <String> consultarCarta(@PathVariable String nombreRestaurante){//Nombre de restaurantes y me devuelve un array de platos en formato String.
 		try {
 			String listaPlatos= this.foodService.platosParaEnviar(nombreRestaurante);
-			if(listaPlatos.length()==0) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El restaurante "+nombreRestaurante+" no tiene carta");
-			}
+			if(listaPlatos.length()==0)
+				return new ResponseEntity<>("", HttpStatus.OK);
 			return new ResponseEntity<>(listaPlatos, HttpStatus.OK);
 		}catch(Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
