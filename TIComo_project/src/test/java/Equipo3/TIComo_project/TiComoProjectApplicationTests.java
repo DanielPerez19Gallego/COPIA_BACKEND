@@ -33,7 +33,6 @@ class TiComoProjectApplicationTests {
 
 	@Test
 	void testFoodService() throws JSONException {
-		assertEquals("", food.consultarRestaurantes());
 		this.crearRestauranteTest();
 		assertNotSame("", food.consultarRestaurantes());
 		assertEquals("", food.platosParaEnviar("prueba"));
@@ -156,6 +155,12 @@ class TiComoProjectApplicationTests {
 		registro2.put("nombre", "NombrePrueba");
 		assertEquals("correo", user.register(registro2));
 
+		JSONObject accesoClient = new JSONObject();
+		accesoClient.put("correoAcceso", "daniprueba5@gmail");
+		accesoClient.put("passwordAcceso", "Clientclient2");
+		assertEquals(true, secService.accesoCliente(accesoClient));
+		accesoClient.put("correoAcceso", "sinacceso@gmail");
+		assertEquals(false, secService.accesoCliente(accesoClient));
 
 		//Login
 		JSONObject jsoooo = new JSONObject();
@@ -200,6 +205,13 @@ class TiComoProjectApplicationTests {
 		assertEquals("admin creado correctamente", user.crearUsuario(registro));
 		assertEquals("correo", user.crearUsuario(registro));
 
+		JSONObject accesoAdmin = new JSONObject();
+		accesoAdmin.put("correoAcceso", "adminprueba3@gmail");
+		accesoAdmin.put("passwordAcceso", "Clientclient2");
+		assertEquals(true, secService.accesoAdmin(accesoAdmin));
+		accesoAdmin.put("correoAcceso", "sinacceso@gmail");
+		assertEquals(false, secService.accesoAdmin(accesoAdmin));
+		
 		//Login
 		JSONObject jsooo = new JSONObject();
 		jsooo.put("pwd", "Clientclient2");
@@ -393,8 +405,5 @@ class TiComoProjectApplicationTests {
 		assertEquals("Usuario eliminado correctamente", user.eliminarUsuario(correo2));
 		assertEquals("correo", user.eliminarUsuario(correo2));
 	}
-
-
-
 
 }
