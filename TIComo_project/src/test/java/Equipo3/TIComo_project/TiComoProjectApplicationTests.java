@@ -6,14 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import Equipo3.TIComo_project.model.Admin;
 import Equipo3.TIComo_project.model.Client;
@@ -33,7 +30,7 @@ class TiComoProjectApplicationTests {
 
 	@Autowired
 	private FoodService food;
-	
+
 	@Test
 	void testFoodService() throws JSONException {
 		assertEquals("", food.consultarRestaurantes());
@@ -61,7 +58,7 @@ class TiComoProjectApplicationTests {
 		jso.put("nombre","prueba");
 		assertEquals("Restaurante creado correctamente", food.crearRestaurante(jso));
 		assertEquals("nombre", food.crearRestaurante(jso));
-		
+
 	}
 
 	void crearPlatoTest() throws JSONException {
@@ -93,9 +90,9 @@ class TiComoProjectApplicationTests {
 		assertEquals("nombre", food.actualizarPlato(jso));
 		jso.put("nombre", "Pizza");
 		assertEquals("Plato actualizado correctamente", food.actualizarPlato(jso));
-		
+
 	}
-	
+
 	void actualizarRestauranteTest() throws JSONException {
 		JSONObject jso = new JSONObject();
 		jso.put("nombre", "noexiste");
@@ -109,12 +106,12 @@ class TiComoProjectApplicationTests {
 		jso.put("nombre", "comoti");
 		assertEquals("Restaurante actualizado correctamente", food.actualizarRestaurante(jso));
 	}
-	
+
 	void eliminarCartaTest() throws JSONException {
 		assertEquals("Carta eliminada correctamente", food.eliminarCarta("prueba"));
 		assertEquals("nombre", food.eliminarCarta("noexiste"));
 	}
-	
+
 	void eliminarRestauranteTest() throws JSONException {
 		assertEquals("Restaurante eliminado correctamente", food.eliminarRestaurante("prueba"));
 		assertEquals("Restaurante eliminado correctamente", food.eliminarRestaurante("comoti"));
@@ -131,7 +128,7 @@ class TiComoProjectApplicationTests {
 		this.userRidersTest();
 		this.userAdminsTest();
 		this.userClientsTest();
-	
+
 	}
 	void registroConSinEliminacionTest() throws JSONException {
 		//CrearUsuarioCliente
@@ -320,16 +317,16 @@ class TiComoProjectApplicationTests {
 		registroParte2.put("zona", "SanFran");
 		assertEquals("rider creado correctamente", user.crearUsuario(registroParte2));
 
-		
-		
-		
-		
+
+
+
+
 		Rider r = new Rider();
 		List <Rider> listaRiders = new ArrayList<>();
 		r.setCorreo("riderPrueba9@gmail");
 		listaRiders.add(r);
 
-		
+
 		assertNotSame(null, user.userRiders(listaRiders));
 
 		assertNotSame("", user.consultarRiders());
@@ -356,10 +353,10 @@ class TiComoProjectApplicationTests {
 		Admin ad = new Admin();
 		List <Admin> listaAdmins = new ArrayList<>();
 		listaAdmins.add(ad);
-		
+
 		ad.setCorreo("adminPrueba9@gmail");
 		listaAdmins.add(ad);
-		
+
 		assertNotSame(null, user.userAdmins(listaAdmins));
 
 		assertNotSame("", user.consultarAdmins());
@@ -381,11 +378,11 @@ class TiComoProjectApplicationTests {
 		registro.put("nombre", "NombrePrueba");
 		assertEquals("Registro completado", user.register(registro));
 
-		
+
 		Client cl = new Client();
 		List <Client> listaClients = new ArrayList<>();
 		listaClients.add(cl);
-		
+
 		cl.setCorreo("daniprueba55@gmail");
 		listaClients.add(cl);
 		assertNotSame(null, user.userClients(listaClients));
@@ -396,9 +393,8 @@ class TiComoProjectApplicationTests {
 		assertEquals("Usuario eliminado correctamente", user.eliminarUsuario(correo2));
 		assertEquals("correo", user.eliminarUsuario(correo2));
 	}
-	
+
 
 
 
 }
-
