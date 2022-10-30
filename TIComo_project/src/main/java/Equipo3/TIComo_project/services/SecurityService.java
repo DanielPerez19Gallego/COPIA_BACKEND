@@ -1,7 +1,5 @@
 package Equipo3.TIComo_project.services;
 
-import javax.servlet.http.HttpSession;
-
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,43 +58,26 @@ public class SecurityService {
 		return list;
 	}
 
-	public boolean accesoAdmin(HttpSession session){
-		Object admino = session.getAttribute("rol");
-		if (admino != null) {
-			String admin = admino.toString();
-			if (admin.equals("admin")) {
-				String correo = session.getAttribute("correo").toString();
-				String password = session.getAttribute("password").toString();
-				if(this.credenciales(correo, password))
-					return true;
-			}
-		}
-		return false;	
+	public boolean accesoAdmin(JSONObject json){
+		 User user = this.userDAO.findByCorreo(json.getString("correoAcceso"));
+	        if(user!=null) {
+	        	String pwd = this.desencriptar(user.getPassword());
+	            if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals("admin"))
+                 return true;
+	        }
+	        return false;
+    }
+
+	public boolean accesoCliente(JSONObject json){
+		 User user = this.userDAO.findByCorreo(json.getString("correoAcceso"));
+	        if(user!=null) {
+	        	String pwd = this.desencriptar(user.getPassword());
+	            if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals("client"))
+                    return true;
+	        }
+	        return false;
 	}
 
-	public boolean accesoCliente(HttpSession session){
-		Object cliente = session.getAttribute("rol");
-		if (cliente != null) {
-			String client = cliente.toString();
-			if (client.equals("client")) {
-				String correo = session.getAttribute("correo").toString();
-				String password = session.getAttribute("password").toString();
-				if(this.credenciales(correo, password))
-					return true;
-			}
-		}
-		return false;	
-	}
-
-	private boolean credenciales(String correo, String password){
-		User user = this.userDAO.findByCorreo(correo);
-		if (user != null) {
-			String pwd = org.apache.commons.codec.digest.DigestUtils.sha512Hex(password);
-			if (user.getPassword().equals(pwd))
-				return true;
-		}
-		return false;
-	}
 
 	public SecretKeySpec crearClave() throws UnsupportedEncodingException, NoSuchAlgorithmException {
 		byte[] claveEncriptacion = this.clave.getBytes("UTF-8");

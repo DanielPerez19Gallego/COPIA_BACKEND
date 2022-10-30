@@ -46,12 +46,12 @@ public class UserService {
 	@Autowired
 	private SecurityService secService;
 	
-	
 	public String login(JSONObject jso){
 		String rol = "nulo";
 		User user = this.userDAO.findByCorreo(jso.getString(this.correo));
 		if (user != null) {
-			if (this.secService.desencriptar(user.getPassword()).equals(jso.getString("pwd"))) {
+			String pwd = this.secService.desencriptar(user.getPassword());
+			if (pwd.equals(jso.getString("pwd"))) {
 				if (user.getRol().equals(this.client))
 					rol = this.client;
 				else if (user.getRol().equals(this.admin))
@@ -276,4 +276,3 @@ public class UserService {
 	}
 
 }
-
