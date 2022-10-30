@@ -1,26 +1,15 @@
 package Equipo3.TIComo_project.http;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.http.HttpSession;
-
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,7 +40,7 @@ public class UserController {
 
 	@CrossOrigin
 	@PostMapping("/login")
-	public ResponseEntity<String> login(HttpSession session , @RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> login(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			String response = this.userService.login(jso);
@@ -59,9 +48,6 @@ public class UserController {
 			if (response.equals("nulo"))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario o password desconocidas");
 			else {
-				session.setAttribute("rol", response);
-				session.setAttribute("correo", jso.getString(this.correo));
-				session.setAttribute("password", jso.getString("pwd"));
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
@@ -71,11 +57,12 @@ public class UserController {
 	
 	@CrossOrigin
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody Map<String, Object> info, HttpSession session) {
-		if (!this.secService.accesoCliente(session))
+	public ResponseEntity<String> register(@RequestBody Map<String, Object> info) {
+		JSONObject jso = new JSONObject(info);
+		
+		if (!this.secService.accesoCliente(jso))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
-			JSONObject jso = new JSONObject(info);
 			String response = "";
 			String [] comprobar = this.secService.comprobarPassword(jso);
 			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
@@ -95,11 +82,12 @@ public class UserController {
 
 	@CrossOrigin
 	@PostMapping("/crearUsuario")
-	public ResponseEntity<String> crearUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
-		if (!this.secService.accesoAdmin(session))
+	public ResponseEntity<String> crearUsuario(@RequestBody Map<String, Object> info) {
+		JSONObject jso = new JSONObject(info);
+		
+		if (!this.secService.accesoAdmin(jso))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
-			JSONObject jso = new JSONObject(info);
 			String response = "";
 			String [] comprobar = this.secService.comprobarPassword(jso);
 			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
@@ -117,11 +105,12 @@ public class UserController {
 
 	@CrossOrigin
 	@PostMapping("/eliminarUsuario")
-	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info, HttpSession session) {
-		if (!this.secService.accesoAdmin(session))
+	public ResponseEntity<String> eliminarUsuario(@RequestBody Map<String, Object> info) {
+		JSONObject jso = new JSONObject(info);
+		
+		if (!this.secService.accesoAdmin(jso))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
-			JSONObject jso = new JSONObject(info);
 			String correoUsuario = jso.getString(this.correo);
 			String response = this.userService.eliminarUsuario(correoUsuario);
 
@@ -136,12 +125,13 @@ public class UserController {
 	}
 
 	@CrossOrigin
-	@PutMapping("/actualizarUsuario/{correo}")
-	public ResponseEntity<String> actualizarUsuario( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info) throws UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, JSONException, InvalidKeyException{
-		if (!this.secService.accesoAdmin(session))
+	@PostMapping("/actualizarUsuario/{correo}")
+	public ResponseEntity<String> actualizarUsuario(@PathVariable("correo") String correo,@RequestBody Map<String, Object> info) {
+		JSONObject json = new JSONObject(info);
+		
+		if (!this.secService.accesoAdmin(json))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		boolean userUpdate = false;
-		JSONObject json = new JSONObject(info);
 		userUpdate= this.userService.actualizarUsuario(correo,json);
 		if (userUpdate) {
 			return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
@@ -151,12 +141,13 @@ public class UserController {
 	}
 
 	@CrossOrigin
-	@PutMapping("/actualizarCliente/{correo}")
-	public ResponseEntity<String> actualizarCliente( HttpSession session, @PathVariable("correo") String correo,@RequestBody Map<String, Object> info) throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, JSONException{
-		if (!this.secService.accesoCliente(session))
+	@PostMapping("/actualizarCliente/{correo}")
+	public ResponseEntity<String> actualizarCliente(@PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
+		JSONObject json = new JSONObject(info);
+		
+		if (!this.secService.accesoCliente(json))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		boolean userUpdate = false;
-		JSONObject json = new JSONObject(info);
 		userUpdate= this.userService.actualizarCliente(correo,json);
 		if (userUpdate) {
 			return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
@@ -166,9 +157,11 @@ public class UserController {
 	}
 
 	@CrossOrigin
-	@GetMapping("/getRiders")
-	public ResponseEntity<String> consultarRiders(HttpSession session) {
-		if (!this.secService.accesoAdmin(session))
+	@PostMapping("/getRiders")
+	public ResponseEntity<String> consultarRiders(@RequestBody Map<String, Object> info) {
+		JSONObject json = new JSONObject(info);
+		
+		if (!this.secService.accesoAdmin(json))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Rider> listaResponse;
 		try {
@@ -184,9 +177,11 @@ public class UserController {
 	}
 
 	@CrossOrigin
-	@GetMapping("/getAdmins")
-	public ResponseEntity<String> consultarAdmins(HttpSession session) {
-		if (!this.secService.accesoAdmin(session))
+	@PostMapping("/getAdmins")
+	public ResponseEntity<String> consultarAdmins(@RequestBody Map<String, Object> info) {
+		JSONObject json = new JSONObject(info);
+		
+		if (!this.secService.accesoAdmin(json))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Admin> listaResponse;
 		try {
@@ -202,9 +197,11 @@ public class UserController {
 	}
 
 	@CrossOrigin
-	@GetMapping("/getClients")
-	public ResponseEntity<String> consultarClients(HttpSession session) {
-		if (!this.secService.accesoAdmin(session))
+	@PostMapping("/getClients")
+	public ResponseEntity<String> consultarClients(@RequestBody Map<String, Object> info) {
+		JSONObject json = new JSONObject(info);
+		
+		if (!this.secService.accesoAdmin(json))
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		List<Client> listaResponse;
 		try {
@@ -218,11 +215,5 @@ public class UserController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
-	}
-
-	@CrossOrigin
-	@GetMapping("/logout")
-	public void cerrarSesion(HttpSession session) {
-		session.invalidate();
 	}
 }
