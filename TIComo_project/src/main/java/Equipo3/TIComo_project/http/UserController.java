@@ -46,7 +46,7 @@ public class UserController {
 			String response = this.userService.login(jso);
 
 			if (response.equals("nulo"))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario o password desconocidas");
+				return new ResponseEntity<>("Usuario o password desconocidas", HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -65,10 +65,10 @@ public class UserController {
 			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
 				response = this.userService.register(jso);
 			else
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, comprobar[1]);
+				return new ResponseEntity<>(comprobar[1], HttpStatus.OK);
 
 			if (response.equals(this.correo))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
+				return new ResponseEntity<>("Ya existe un usuario con ese correo", HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -83,17 +83,17 @@ public class UserController {
 		JSONObject jso = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		try {
 			String response = "";
 			String [] comprobar = this.secService.comprobarPassword(jso);
 			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
 				response = this.userService.crearUsuario(jso);
 			else
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, comprobar[1]);
+				return new ResponseEntity<>(comprobar[1], HttpStatus.OK);
 
 			if (response.equals(this.correo))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
+				return new ResponseEntity<>("Ya existe un usuario con ese correo", HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -108,13 +108,13 @@ public class UserController {
 		JSONObject jso = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		try {
 			String correoUsuario = jso.getString(this.correo);
 			String response = this.userService.eliminarUsuario(correoUsuario);
 
 			if (response.equals(this.correo))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
+				return new ResponseEntity<>(this.noExiste, HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -130,11 +130,11 @@ public class UserController {
 		
 		if (json.getString("rol").equals("client")) {
 			if (!this.secService.accesoAdmin(json) && !this.secService.accesoCliente(json))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		}
 		else {	
 			if (!this.secService.accesoAdmin(json))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		}
 		
 		boolean userUpdate = false;
@@ -142,7 +142,7 @@ public class UserController {
 		if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
 			userUpdate= this.userService.actualizarUsuario(correo,json);
 		else
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, comprobar[1]);
+			return new ResponseEntity<>(comprobar[1], HttpStatus.OK);
 		
 		if (userUpdate) {
 			return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
@@ -157,7 +157,7 @@ public class UserController {
 		JSONObject json = new JSONObject(info);
 		
 		if (!this.secService.accesoCliente(json))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		boolean userUpdate = false;
 		userUpdate= this.userService.actualizarCliente(correo,json);
 		if (userUpdate) {
@@ -173,7 +173,7 @@ public class UserController {
 		JSONObject json = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(json))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		List<Rider> listaResponse;
 		try {
 			listaResponse = this.userService.consultarRiders();  //Recojo la lista en una variable.
@@ -193,7 +193,7 @@ public class UserController {
 		JSONObject json = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(json))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		List<Admin> listaResponse;
 		try {
 			listaResponse = this.userService.consultarAdmins();  //Recojo la lista en una variable.
@@ -213,7 +213,7 @@ public class UserController {
 		JSONObject json = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(json))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		List<Client> listaResponse;
 		try {
 			listaResponse = this.userService.consultarClients();  //Recojo la lista en una variable.

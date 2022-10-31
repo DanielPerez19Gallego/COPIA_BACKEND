@@ -38,12 +38,12 @@ public class FoodController {
 		JSONObject jso = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		try {
 			String response = this.foodService.crearRestaurante(jso);
 
 			if (response.equals(this.nombre))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un restaurante con ese nombre");
+				return new ResponseEntity<>("Ya existe un restaurante con ese nombre", HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -58,13 +58,13 @@ public class FoodController {
 		JSONObject jso = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		try {
 			String nombreRes = jso.getString(this.nombre);
 			String response = this.foodService.eliminarRestaurante(nombreRes);
 
 			if (response.equals(this.nombre))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un restaurante llamado " + nombreRes);
+				return new ResponseEntity<>("No existe un restaurante llamado " + nombreRes, HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -79,11 +79,11 @@ public class FoodController {
 		JSONObject jso = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		try {
 			String response = this.foodService.actualizarRestaurante(jso);
 			if (response.equals(this.nombre))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un restaurante con ese nombre");
+				return new ResponseEntity<>("No existe un restaurante con ese nombre", HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -109,11 +109,11 @@ public class FoodController {
 		JSONObject jso = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		try {
 			String response = this.foodService.crearPlato(jso);
 			if (response.equals(this.nombre))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un plato con ese nombre");
+				return new ResponseEntity<>("Ya existe un plato con ese nombre", HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -128,13 +128,13 @@ public class FoodController {
 		JSONObject jso = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		try {
 			String response = this.foodService.actualizarPlato(jso);
 			if (response.equals(this.nombre))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un plato con ese nombre");
+				return new ResponseEntity<>("Ya existe un plato con ese nombre", HttpStatus.OK);
 			else if (response.equals("noexiste"))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un plato con ese nombre");
+				return new ResponseEntity<>("No existe un plato con ese nombre", HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
@@ -162,12 +162,12 @@ public class FoodController {
 		JSONObject jso = new JSONObject(info);
 		
 		if (!this.secService.accesoAdmin(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		try {
 			String response = this.foodService.eliminarCarta(restaurante);
 
 			if (response.equals(this.nombre))
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No existe un restaurante llamado " + restaurante);
+				return new ResponseEntity<>("No existe un restaurante llamado " + restaurante, HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
