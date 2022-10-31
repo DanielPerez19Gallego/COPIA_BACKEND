@@ -210,7 +210,7 @@ public class UserService {
 			else
 				bld.append(jso.toString() + ";");
 		}
-		return bld.toString().replace(" ", "");
+		return bld.toString();
 	}
 
 	public JSONObject userAdmin(Admin admin) {
@@ -235,7 +235,7 @@ public class UserService {
 			else
 				bld.append(jso.toString() + ";");
 		}
-		return bld.toString().replace(" ", "");
+		return bld.toString();
 	}
 
 	public JSONObject userClient(Client client) {
@@ -261,7 +261,7 @@ public class UserService {
 			else
 				bld.append(jso.toString() + ";");
 		}
-		return bld.toString().replace(" ", "");
+		return bld.toString();
 	}
 
 	public List<Rider> consultarRiders(){

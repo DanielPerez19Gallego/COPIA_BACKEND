@@ -81,7 +81,7 @@ public class FoodService {
 				else
 					bld.append(resJSO.toString() + ";");
 			}
-			return bld.toString().replace(" ", "");
+			bld.toString();
 		}
 		return "";
 	}
@@ -152,7 +152,7 @@ public class FoodService {
 				else
 					bld.append(jso.toString() + ";");
 			}
-			return bld.toString().replace(" ", "");
+			return bld.toString();
 		}
 		return "";
 	}
