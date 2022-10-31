@@ -173,7 +173,7 @@ class TiComoProjectApplicationTests {
 		String correo4 = "daniprueba5@gmail";
 		JSONObject actualizarUsuario4 = new JSONObject();
 		actualizarUsuario4.put("rol", "client");
-		actualizarUsuario4.put("contraseña", "Clientclient2");
+		actualizarUsuario4.put("pwd1", "Clientclient2");
 		actualizarUsuario4.put("nif", "asdasd");
 		actualizarUsuario4.put("direccion","pilar");
 		actualizarUsuario4.put("telefono","12312");
@@ -223,11 +223,12 @@ class TiComoProjectApplicationTests {
 		JSONObject actualizarUsuario1 = new JSONObject();
 		actualizarUsuario1.put("rol", "admin");
 		actualizarUsuario1.put("zona", "sanfran2");
-		actualizarUsuario1.put("contraseña", "Clientclient2");
+		actualizarUsuario1.put("pwd1", "Clientclient2");
 		actualizarUsuario1.put("nombre", "nombreTest");
 		actualizarUsuario1.put("apellidos","apellidos");
 		actualizarUsuario1.put("direccion","direccion");
 		actualizarUsuario1.put("telefono","telefono");
+		actualizarUsuario1.put("nif","telefono");
 		assertEquals(true, user.actualizarUsuario(correo1, actualizarUsuario1));
 		assertEquals(false, user.actualizarUsuario("lasmuestras", actualizarUsuario1));
 		//Eliminar
@@ -271,9 +272,10 @@ class TiComoProjectApplicationTests {
 		actualizarUsuario2.put("carnet", "si");
 		actualizarUsuario2.put("matricula", "si");
 		actualizarUsuario2.put("tipoVehiculo", "si");
-		actualizarUsuario2.put("contraseña", "Clientclient2");
+		actualizarUsuario2.put("pwd1", "Clientclient2");
 		actualizarUsuario2.put("nombre", "asd");
 		actualizarUsuario2.put("apellidos", "asd");
+		actualizarUsuario2.put("nif","telefono");
 		assertEquals(true, user.actualizarUsuario(correoActu, actualizarUsuario2));
 
 		//Eliminar
