@@ -175,7 +175,8 @@ public class UserService {
 	public boolean actualizarUser(String correo, JSONObject json){
 		User nuevo = this.userDAO.findByCorreo(correo);
 		if (nuevo!=null) {
-			nuevo.setPassword(json.getString(this.password));
+			nuevo.setPassword(this.secService.encriptar(json.getString("pwd1")));
+			nuevo.setNif(this.secService.encriptar(json.getString("nif")));
 			nuevo.setNombre(json.getString(this.nombre));
 			nuevo.setApellidos(json.getString(this.apellidos));
 			nuevo.setRol(json.getString("rol"));
