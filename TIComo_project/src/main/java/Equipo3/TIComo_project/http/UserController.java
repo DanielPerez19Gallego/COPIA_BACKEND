@@ -59,9 +59,6 @@ public class UserController {
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody Map<String, Object> info) {
 		JSONObject jso = new JSONObject(info);
-		
-		if (!this.secService.accesoCliente(jso))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
 		try {
 			String response = "";
 			String [] comprobar = this.secService.comprobarPassword(jso);
@@ -92,6 +89,8 @@ public class UserController {
 			String [] comprobar = this.secService.comprobarPassword(jso);
 			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
 				response = this.userService.crearUsuario(jso);
+			else
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, comprobar[1]);
 
 			if (response.equals(this.correo))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya existe un usuario con ese correo");
@@ -129,10 +128,22 @@ public class UserController {
 	public ResponseEntity<String> actualizarUsuario(@PathVariable("correo") String correo,@RequestBody Map<String, Object> info) {
 		JSONObject json = new JSONObject(info);
 		
-		if (!this.secService.accesoAdmin(json))
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+		if (json.getString("rol").equals("client")) {
+			if (!this.secService.accesoAdmin(json) && !this.secService.accesoCliente(json))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+		}
+		else {	
+			if (!this.secService.accesoAdmin(json))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.sinAcceso);
+		}
+		
 		boolean userUpdate = false;
-		userUpdate= this.userService.actualizarUsuario(correo,json);
+		String [] comprobar = this.secService.comprobarPassword(json);
+		if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
+			userUpdate= this.userService.actualizarUsuario(correo,json);
+		else
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, comprobar[1]);
+		
 		if (userUpdate) {
 			return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
 		}else {
