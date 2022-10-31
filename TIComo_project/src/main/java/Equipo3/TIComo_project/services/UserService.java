@@ -218,7 +218,7 @@ public class UserService {
 		jso.put(this.nombre, user.getNombre());
 		jso.put(this.password, this.secService.desencriptar(user.getPassword()));
 		jso.put(this.apellidos, user.getApellidos());
-		jso.put(this.correo, correo);
+		jso.put(this.correo, admin.getCorreo());
 		jso.put("nif", this.secService.desencriptar(user.getNif()));
 		jso.put("zona",admin.getZona());
 		return jso;    
@@ -243,7 +243,7 @@ public class UserService {
 		jso.put(this.nombre, user.getNombre());
 		jso.put(this.password, this.secService.desencriptar(user.getPassword()));
 		jso.put(this.apellidos, user.getApellidos());
-		jso.put(this.correo, correo);
+		jso.put(this.correo, client.getCorreo());
 		jso.put("nif",this.secService.desencriptar(user.getNif()));
 		jso.put(this.direccion, client.getDireccion());
 		jso.put(this.telefono, client.getTelefono());
