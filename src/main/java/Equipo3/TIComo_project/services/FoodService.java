@@ -157,4 +157,14 @@ public class FoodService {
 		return "";
 	}
 
+	public String eliminarPlato(JSONObject jso) {
+        String nombreRes = jso.getString("nombreRes");
+        String nombrePlato = jso.getString("nombrePlato");
+        Restaurant res = this.restDAO.findByNombre(nombreRes);
+        if (res == null)
+            return this.nombre;
+        this.platoDAO.deleteByNombreAndNombreRestaurante(nombrePlato,nombreRes);
+        return "Plato eliminado correctamente";
+   }
+
 }
