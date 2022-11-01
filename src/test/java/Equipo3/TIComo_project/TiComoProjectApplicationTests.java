@@ -181,8 +181,8 @@ class TiComoProjectApplicationTests {
 		actualizarUsuario4.put("nombre", "NombrePrueba");
 		assertEquals(true, user.actualizarUsuario(correo4, actualizarUsuario4));
 
-		assertEquals(true, user.actualizarCliente(correo4, actualizarUsuario4));
-		assertEquals(false, user.actualizarCliente("amai@gmail", actualizarUsuario4));
+		assertEquals(true, user.actualizarUsuario(correo4, actualizarUsuario4));
+		assertEquals(false, user.actualizarUsuario("amai@gmail", actualizarUsuario4));
 		//Eliminar
 		String correo2 = "daniprueba5@gmail";
 		assertEquals("Usuario eliminado correctamente", user.eliminarUsuario(correo2));
