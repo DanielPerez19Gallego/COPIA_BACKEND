@@ -1,13 +1,12 @@
 package Equipo3.TIComo_project.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection="Riders")
 public class Rider {
 
+	private String correo;
 	private String tipovehiculo;
-	@Field("Matricula")
 	private String matricula;
 	private boolean carnet;
 	
@@ -33,5 +32,13 @@ public class Rider {
 	
 	public void setCarnet(boolean carnet) {
 		this.carnet = carnet;
+	}
+
+	public String getCorreo() {
+		return correo;
+	}
+
+	public void setCorreo(String correo) {
+		this.correo = correo;
 	}
 }

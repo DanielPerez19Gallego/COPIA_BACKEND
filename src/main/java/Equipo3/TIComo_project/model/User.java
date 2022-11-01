@@ -28,12 +28,15 @@ public class User {
 		this.correo = correo;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getPassword(){
+		return this.password;
+
 	}
 
-	public void setPassword(String password) {
-		this.password = org.apache.commons.codec.digest.DigestUtils.sha512Hex(password);
+	public void setPassword(String password){
+
+		this.password = password;
+
 	}
 
 	public String getNombre() {
@@ -51,12 +54,12 @@ public class User {
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
 	}
-	
+
 	public String getNif() {
 		return nif;
 	}
-	
+
 	public void setNif(String nif) {
-		this.nif = org.apache.commons.codec.digest.DigestUtils.sha256Hex(nif);
+		this.nif = nif;
 	}
 }
