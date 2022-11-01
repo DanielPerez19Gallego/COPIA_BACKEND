@@ -127,28 +127,35 @@ public class UserController {
 	@PostMapping("/actualizarUsuario/{correo}")
 	public ResponseEntity<String> actualizarUsuario(@PathVariable("correo") String correo,@RequestBody Map<String, Object> info) {
 		JSONObject json = new JSONObject(info);
+		boolean acceso = false;
 		
 		if (json.getString("rol").equals("client")) {
-			if (!(this.secService.accesoAdmin(json)) && !(this.secService.accesoCliente(json)))
+			if (this.secService.accesoAdmin(json) || this.secService.accesoCliente(json))
+				acceso = true;
+			else
 				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		}
 		else {	
-			if (!this.secService.accesoAdmin(json))
-				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+			if (this.secService.accesoAdmin(json))
+				acceso = true;
 		}
 		
-		boolean userUpdate = false;
-		String [] comprobar = this.secService.comprobarPassword(json);
-		if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
-			userUpdate= this.userService.actualizarUsuario(correo,json);
-		else
-			return new ResponseEntity<>(comprobar[1], HttpStatus.OK);
-		
-		if (userUpdate) {
-			return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
-		}else {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
+		if(acceso) {
+			boolean userUpdate = false;
+			String [] comprobar = this.secService.comprobarPassword(json);
+			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
+				userUpdate= this.userService.actualizarUsuario(correo,json);
+			else
+				return new ResponseEntity<>(comprobar[1], HttpStatus.OK);
+			
+			if (userUpdate) {
+				return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
+			}else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
+			}
 		}
+		return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		
 	}
 
 	@CrossOrigin
