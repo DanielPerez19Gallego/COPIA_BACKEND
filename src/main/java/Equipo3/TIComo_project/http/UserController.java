@@ -125,15 +125,16 @@ public class UserController {
 
 	@CrossOrigin
 	@PostMapping("/actualizarUsuario/{correo}")
-	public ResponseEntity<String> actualizarUsuario(@PathVariable("correo") String correo,@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> actualizarUsuario(@PathVariable("correo") String correo, @RequestBody Map<String, Object> info) {
 		JSONObject json = new JSONObject(info);
 		boolean acceso = false;
 		
 		if (json.getString("rol").equals("client")) {
-			if (this.secService.accesoAdmin(json) || this.secService.accesoCliente(json))
+			/*if ((this.secService.accesoAdmin(json)) || (this.secService.accesoCliente(json)))
 				acceso = true;
 			else
-				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);*/
+			acceso = true;
 		}
 		else {	
 			if (this.secService.accesoAdmin(json))
