@@ -143,11 +143,15 @@ public class UserService {
 			if (json.getString("rol").equals(this.admin)) {
 				Admin adminn = this.adminDAO.findByCorreo(correo);
 				adminn.setZona(json.getString("zona"));
+				this.adminDAO.deleteByCorreo(correo);
+				this.adminDAO.save(adminn);
 			}else if (json.getString("rol").equals(this.rider)) {
 				Rider riderr = this.riderDAO.findByCorreo(correo);
 				riderr.setCarnet(Boolean.valueOf(json.getString(this.carnet)));
 				riderr.setMatricula(json.getString(this.matricula));
 				riderr.setTipovehiculo(json.getString("tipoVehiculo"));
+				this.riderDAO.deleteByCorreo(correo);
+				this.riderDAO.save(riderr);
 			}else {
 				this.actualizarCli(correo, json);
 			}
