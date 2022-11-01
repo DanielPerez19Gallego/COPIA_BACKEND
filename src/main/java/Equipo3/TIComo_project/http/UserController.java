@@ -127,21 +127,9 @@ public class UserController {
 	@PostMapping("/actualizarUsuario/{correo}")
 	public ResponseEntity<String> actualizarUsuario(@PathVariable("correo") String correo, @RequestBody Map<String, Object> info) {
 		JSONObject json = new JSONObject(info);
-		boolean acceso = false;
-		
-		if (json.getString("rol").equals("client")) {
-			/*if ((this.secService.accesoAdmin(json)) || (this.secService.accesoCliente(json)))
-				acceso = true;
-			else
-				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);*/
-			acceso = true;
-		}
-		else {	
-			if (this.secService.accesoAdmin(json))
-				acceso = true;
-		}
-		
-		if(acceso) {
+
+		if(this.secService.accesoAdmin(json)) {
+			
 			boolean userUpdate = false;
 			String [] comprobar = this.secService.comprobarPassword(json);
 			if (Boolean.TRUE.equals(Boolean.valueOf(comprobar[0])))
@@ -152,27 +140,11 @@ public class UserController {
 			if (userUpdate) {
 				return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
 			}else {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
+				return new ResponseEntity<>(this.noExiste, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		
-	}
-
-	@CrossOrigin
-	@PostMapping("/actualizarCliente/{correo}")
-	public ResponseEntity<String> actualizarCliente(@PathVariable("correo") String correo,@RequestBody Map<String, Object> info){
-		JSONObject json = new JSONObject(info);
-		
-		if (!this.secService.accesoCliente(json))
-			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
-		boolean userUpdate = false;
-		userUpdate= this.userService.actualizarCliente(correo,json);
-		if (userUpdate) {
-			return new ResponseEntity<>("Usuario actualizado", HttpStatus.OK);
-		}else {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.noExiste);
-		}
 	}
 
 	@CrossOrigin
