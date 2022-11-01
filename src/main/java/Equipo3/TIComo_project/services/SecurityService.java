@@ -25,7 +25,7 @@ public class SecurityService {
 	@Autowired
 	private UserRepository userDAO;
 
-	private String clave = "TICOMO_3";
+	private String clave = "TICOMO_3";//clave para encriptar y desencriptar
 
 	public String[] comprobarPassword(JSONObject info) {
 
