@@ -129,7 +129,7 @@ public class UserController {
 		JSONObject json = new JSONObject(info);
 		
 		if (json.getString("rol").equals("client")) {
-			if (!this.secService.accesoAdmin(json) && !this.secService.accesoCliente(json))
+			if (!(this.secService.accesoAdmin(json)) && !(this.secService.accesoCliente(json)))
 				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		}
 		else {	
