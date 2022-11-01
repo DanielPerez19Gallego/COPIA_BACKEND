@@ -52,14 +52,10 @@
 			<plugin>
             			<groupId>org.springframework.boot</groupId>
             			<artifactId>spring-boot-maven-plugin</artifactId>
-
             			<configuration>
-
-                		<mainClass>Equipo3.TIComo_project.TiComoProjectApplication</mainClass>
-
-            </configuration>
-
-        </plugin>
+                			<mainClass>Equipo3.TIComo_project.TiComoProjectApplication</mainClass>
+            			</configuration>
+        		</plugin>
 		</plugins>
 	</build>
 
