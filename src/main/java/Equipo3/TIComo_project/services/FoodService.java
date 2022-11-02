@@ -150,7 +150,7 @@ public class FoodService {
 				if (i == listaPlatos.size() - 1)
 					bld.append(jso.toString());
 				else
-					bld.append(jso.toString() + ";");
+					bld.append(jso.toString() + ";;");
 			}
 			return bld.toString();
 		}
