@@ -98,7 +98,7 @@ public class UserService {
 			riderr.setCarnet(Boolean.valueOf(jso.getString(this.carnet)));
 			riderr.setCorreo(jso.getString(this.correo));
 			riderr.setMatricula(jso.getString(this.matricula ));
-			riderr.setTipovehiculo(jso.getString("tipovehiculo"));
+			riderr.setTipovehiculo(jso.getString("tipoVehiculo"));
 			this.riderDAO.save(riderr);
 		} else {
 			Admin adminn = new Admin();
@@ -155,14 +155,6 @@ public class UserService {
 			}else {
 				this.actualizarCli(correo, json);
 			}
-			return true;
-		}
-		return false;
-	}
-
-	public boolean actualizarCliente(String correo, JSONObject json){
-		if (this.actualizarUser(correo, json)) {
-			this.actualizarCli(correo, json);
 			return true;
 		}
 		return false;
