@@ -129,7 +129,7 @@ public class FoodService {
 		List <Plate> plato = this.platoDAO.findByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);
 		if (plato.isEmpty())
 			return "noexiste";
-		if (this.existePlatoenRestaurante(nombreNuevo, nombreRestaurante)) 
+		if (this.existePlatoenRestaurante(nombreNuevo, nombreRestaurante) && !nombreNuevo.equals(nombreViejo)) 
 			return this.nombre;
 		
 		Plate platt = this.crearPlatoAux(jso, plato.get(0));
