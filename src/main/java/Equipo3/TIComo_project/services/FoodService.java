@@ -101,6 +101,7 @@ public class FoodService {
 		if (this.existePlatoenRestaurante(nombrePlato, nombreRestaurante)) 
 			return this.nombre;
 		Plate pla = new Plate();
+		pla.setIdPlato();
 		pla = this.crearPlatoAux(jso, pla);
 		pla.setNombreRestaurante(nombreRestaurante);
 		platoDAO.save(pla);
@@ -126,7 +127,9 @@ public class FoodService {
 		String nombreViejo = jso.getString("nombreViejo");
 		String nombreNuevo = jso.getString(this.nombre);
 		String nombreRestaurante = jso.getString("nombreRestaurante");
-		List <Plate> plato = this.platoDAO.findByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);
+		String idPlato = jso.getString("idPlato");
+		//List <Plate> plato = this.platoDAO.findByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);//id aqui
+		List <Plate> plato = this.platoDAO.findByidPlato(idPlato);
 		if (plato.isEmpty())
 			return "noexiste";
 		if (this.existePlatoenRestaurante(nombreNuevo, nombreRestaurante) && !nombreNuevo.equals(nombreViejo)) 
@@ -134,7 +137,8 @@ public class FoodService {
 		
 		Plate platt = this.crearPlatoAux(jso, plato.get(0));
 		
-		this.platoDAO.deleteByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);
+		//this.platoDAO.deleteByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);//id aqui
+		this.platoDAO.deleteByidPlato(idPlato);
 		this.platoDAO.save(platt);
 		
 		return "Plato actualizado correctamente";
@@ -158,13 +162,25 @@ public class FoodService {
 	}
 
 	public String eliminarPlato(JSONObject jso) {
-        String nombreRes = jso.getString("nombreRes");
-        String nombrePlato = jso.getString("nombrePlato");
-        Restaurant res = this.restDAO.findByNombre(nombreRes);
-        if (res == null)
+        String idPlato = jso.getString("idPlato");
+        List<Plate> listt = this.platoDAO.findByidPlato(idPlato);
+        if (listt.isEmpty())
             return this.nombre;
-        this.platoDAO.deleteByNombreAndNombreRestaurante(nombrePlato,nombreRes);
+        this.platoDAO.deleteByidPlato(idPlato);
         return "Plato eliminado correctamente";
    }
+
+	public String listaPlatos(String[] plates) {
+		StringBuilder bld = new StringBuilder();
+		for(int i=0; i<plates.length;i++) {
+			Plate platoo = this.platoDAO.findByidPlato(plates[i]).get(0);
+			JSONObject jso = platoo.toJSON();
+			if (i == plates.length - 1)
+				bld.append(jso.toString());
+			else
+				bld.append(jso.toString() + ";;");
+		}
+		return bld.toString();
+	}
 
 }

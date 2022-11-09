@@ -76,7 +76,7 @@ public class UserService {
 		clientt.setCorreo(jso.getString(this.correo));
 		clientt.setDireccion(jso.getString(this.direccion));
 		clientt.setTelefono(jso.getString(this.telefono));
-
+		clientt.setActivo(true);
 		this.clientDAO.save(clientt);
 		this.userDAO.save(user);
 		return "Registro completado";
@@ -99,6 +99,7 @@ public class UserService {
 			riderr.setCorreo(jso.getString(this.correo));
 			riderr.setMatricula(jso.getString(this.matricula ));
 			riderr.setTipovehiculo(jso.getString("tipoVehiculo"));
+			riderr.setActivo(true);
 			this.riderDAO.save(riderr);
 		} else {
 			Admin adminn = new Admin();
@@ -150,6 +151,7 @@ public class UserService {
 				riderr.setCarnet(Boolean.valueOf(json.getString(this.carnet)));
 				riderr.setMatricula(json.getString(this.matricula));
 				riderr.setTipovehiculo(json.getString("tipoVehiculo"));
+				riderr.setActivo(Boolean.valueOf(json.getString("activo")));
 				this.riderDAO.deleteByCorreo(correo);
 				this.riderDAO.save(riderr);
 			}else {
@@ -164,6 +166,7 @@ public class UserService {
 		Client clientt = this.clientDAO.findByCorreo(correo);
 		clientt.setDireccion(json.getString(this.direccion));
 		clientt.setTelefono(json.getString(this.telefono));
+		clientt.setActivo(Boolean.valueOf(json.getString("activo")));
 		this.clientDAO.deleteByCorreo(correo);
 		this.clientDAO.save(clientt);
 	}
@@ -193,6 +196,7 @@ public class UserService {
 		jso.put("nif", this.secService.desencriptar(user.getNif()));
 		jso.put(this.carnet, rid.isCarnet());
 		jso.put(this.matricula, rid.getMatricula());
+		jso.put("activo", rid.isActivo());
 		return jso;	
 	}
 
@@ -244,6 +248,7 @@ public class UserService {
 		jso.put("nif",this.secService.desencriptar(user.getNif()));
 		jso.put(this.direccion, client.getDireccion());
 		jso.put(this.telefono, client.getTelefono());
+		jso.put("activo", client.isActivo());
 		return jso;    
 	}
 

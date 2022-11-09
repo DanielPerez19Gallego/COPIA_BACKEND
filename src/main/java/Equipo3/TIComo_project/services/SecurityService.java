@@ -4,7 +4,11 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import Equipo3.TIComo_project.dao.ClientRepository;
+import Equipo3.TIComo_project.dao.RiderRepository;
 import Equipo3.TIComo_project.dao.UserRepository;
+import Equipo3.TIComo_project.model.Client;
+import Equipo3.TIComo_project.model.Rider;
 import Equipo3.TIComo_project.model.User;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -25,7 +29,11 @@ public class SecurityService {
 	@Autowired
 	private UserRepository userDAO;
 
-	private String clave = "TICOMO_3";//clave para encriptar y desencriptar
+	private String clave = "TICOMO_3";
+
+	private ClientRepository clientDAO;
+
+	private RiderRepository riderDAO;
 
 	public String[] comprobarPassword(JSONObject info) {
 
@@ -59,23 +67,39 @@ public class SecurityService {
 	}
 
 	public boolean accesoAdmin(JSONObject json){
-		 User user = this.userDAO.findByCorreo(json.getString("correoAcceso"));
-	        if(user!=null) {
-	        	String pwd = this.desencriptar(user.getPassword());
-	            if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals("admin"))
-                 return true;
-	        }
-	        return false;
-    }
+		User user = this.userDAO.findByCorreo(json.getString("correoAcceso"));
+		if(user!=null) {
+			String pwd = this.desencriptar(user.getPassword());
+			if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals("admin"))
+				return true;
+		}
+		return false;
+	}
 
 	public boolean accesoCliente(JSONObject json){
-		 User user = this.userDAO.findByCorreo(json.getString("correoAcceso"));
-	        if(user!=null) {
-	        	String pwd = this.desencriptar(user.getPassword());
-	            if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals("client"))
-                    return true;
-	        }
-	        return false;
+		User user = this.userDAO.findByCorreo(json.getString("correoAcceso"));
+		if(user!=null) {
+			String pwd = this.desencriptar(user.getPassword());
+			if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals("client"))
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean isActivo(String correo) {
+		User user = this.userDAO.findByCorreo(correo);
+		if(user != null) {
+			if(user.getRol().equals("client")) {
+				Client clientee = this.clientDAO.findByCorreo(correo);
+				return clientee.isActivo();
+			}
+			if(user.getRol().equals("rider")) {
+				Rider riderr = this.riderDAO.findByCorreo(correo);
+				return riderr.isActivo();
+			}
+			return true;
+		}
+		return false;
 	}
 
 
