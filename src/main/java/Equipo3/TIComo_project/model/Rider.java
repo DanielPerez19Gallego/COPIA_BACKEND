@@ -9,7 +9,16 @@ public class Rider {
 	private String tipovehiculo;
 	private String matricula;
 	private boolean carnet;
+	private boolean activo;
 	
+	public boolean isActivo() {
+		return activo;
+	}
+
+	public void setActivo(boolean activo) {
+		this.activo = activo;
+	}
+
 	public String getMatricula() {
 		return matricula;
 	}

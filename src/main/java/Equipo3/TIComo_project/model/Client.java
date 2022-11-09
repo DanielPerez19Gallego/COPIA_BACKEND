@@ -8,6 +8,7 @@ public class Client {
 	private String correo;
 	private String direccion;
 	private String telefono;
+	private boolean activo;
 	
 	public String getCorreo() {
 		return correo;
@@ -30,6 +31,12 @@ public class Client {
 	
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
+	}
+	public boolean isActivo() {
+		return activo;
+	}
+	public void setActivo(boolean activo) {
+		this.activo = activo;
 	}
 	
 	

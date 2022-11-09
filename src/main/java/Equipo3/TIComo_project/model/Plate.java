@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 public class Plate {
 
+	private String idPlato;
 	private String nombre;
 	private String foto;
 	private String descripcion;
@@ -61,8 +62,18 @@ public class Plate {
 	public void setNombreRestaurante(String nombreRestaurante) {
 		this.nombreRestaurante = nombreRestaurante;
 	}
+	
+	public String getIdPlato() {
+		return idPlato;
+	}
+
+	public void setIdPlato() {
+		this.idPlato = java.util.UUID.randomUUID().toString();
+	}
+	
 	 public JSONObject toJSON() {
         JSONObject jso = new JSONObject();
+        jso.put("idPlato", idPlato);
         jso.put("nombre", nombre);
         jso.put("foto", foto);
         jso.put("descripcion", descripcion);
@@ -71,5 +82,6 @@ public class Plate {
         jso.put("nombreRestaurante", nombreRestaurante);
         return jso;
 	 }
+
 }
 
