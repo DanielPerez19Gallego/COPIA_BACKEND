@@ -153,7 +153,7 @@ public class FoodController {
 			if (response.equals(this.nombre))
 				return new ResponseEntity<>("Ya existe un plato con ese nombre", HttpStatus.OK);
 			else if (response.equals("noexiste"))
-				return new ResponseEntity<>("No existe un plato con ese nombre", HttpStatus.OK);
+				return new ResponseEntity<>("Plato no encontrado", HttpStatus.OK);
 			else {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
