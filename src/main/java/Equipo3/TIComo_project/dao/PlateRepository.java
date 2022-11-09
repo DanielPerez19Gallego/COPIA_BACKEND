@@ -19,4 +19,8 @@ public interface PlateRepository extends MongoRepository <Plate, String> {
 	List <Plate> findByNombreRestaurante(String nombreRes);
 
 	void deleteByNombreRestaurante(String nombreRes);
+	
+	void deleteByidPlato(String idPlato);
+	
+	List<Plate> findByidPlato(String idPlato);
 }
