@@ -67,20 +67,22 @@ public class SecurityService {
 	}
 
 	public boolean accesoAdmin(JSONObject json){
-		User user = this.userDAO.findByCorreo(json.getString("correoAcceso"));
-		if(user!=null) {
-			String pwd = this.desencriptar(user.getPassword());
-			if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals("admin"))
-				return true;
-		}
-		return false;
+		return tieneAcceso(json, json.getString("rol"));
 	}
 
 	public boolean accesoCliente(JSONObject json){
+		return tieneAcceso(json, json.getString("rol"));
+	}
+	
+	public boolean accesoRider(JSONObject json) {
+		return tieneAcceso(json, json.getString("rol"));
+	}
+	
+	public boolean tieneAcceso(JSONObject json, String rol) {
 		User user = this.userDAO.findByCorreo(json.getString("correoAcceso"));
 		if(user!=null) {
 			String pwd = this.desencriptar(user.getPassword());
-			if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals("client"))
+			if(pwd.equals(json.getString("passwordAcceso")) && user.getRol().equals(rol))
 				return true;
 		}
 		return false;
