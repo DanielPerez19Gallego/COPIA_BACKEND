@@ -32,24 +32,6 @@ public class PedidoController {
 	private String sinAcceso = "No tienes acceso a este servicio";
 	
 	private String inActivo = "Tu cuenta no se encuentra activa";
-
-	@CrossOrigin
-	@PostMapping("/consultarPedidos{cliente}")
-	public ResponseEntity<String> consultarPedidos(@RequestBody Map<String, Object> info, @PathVariable String cliente) {
-		try {
-			JSONObject jso = new JSONObject(info);
-			if (this.secService.accesoCliente(jso)) {
-				if(this.secService.isActivo(jso.getString("correoAcceso"))){
-					String response = this.pedidoService.consultarPedidosCliente(cliente);
-					return new ResponseEntity<>(response, HttpStatus.OK);
-				}
-				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
-			}
-			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-	}
 	
 	@CrossOrigin
 	@PostMapping("/crearPedido")
@@ -67,6 +49,24 @@ public class PedidoController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+
+	@CrossOrigin
+	@PostMapping("/consultarPedidosCliente/{cliente}")
+	public ResponseEntity<String> consultarPedidos(@RequestBody Map<String, Object> info, @PathVariable String cliente) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoCliente(jso)) {
+				if(this.secService.isActivo(jso.getString("correoAcceso"))){
+					String response = this.pedidoService.consultarPedidosCliente(cliente);
+					return new ResponseEntity<>(response, HttpStatus.OK);
+				}
+				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
 	
 	@CrossOrigin
 	@PostMapping("/consultarTodosPedidos")
@@ -76,6 +76,57 @@ public class PedidoController {
 			if (this.secService.accesoAdmin(jso)) {
 				String response = this.pedidoService.consultarTodosPedidos();
 				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	@CrossOrigin
+	@PostMapping("/consultarPedidosRes/{restaurante}")
+	public ResponseEntity<String> consultarTodosPedidos(@RequestBody Map<String, Object> info, @PathVariable String restaurante) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoAdmin(jso)) {
+				String response = this.pedidoService.consultarPedidosRes(restaurante);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	@CrossOrigin
+	@PostMapping("/consultarPedidosRider/{rider}")
+	public ResponseEntity<String> consultarPedidosRider(@RequestBody Map<String, Object> info, @PathVariable String rider) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoRider(jso)) {
+				if(this.secService.isActivo(jso.getString("correoAcceso"))){
+					String response = this.pedidoService.consultarPedidosRider(rider);
+					return new ResponseEntity<>(response, HttpStatus.OK);
+				}
+				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	@CrossOrigin
+	@PostMapping("/consultarPedidosPre")
+	public ResponseEntity<String> consultarPedidosRider(@RequestBody Map<String, Object> info) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoRider(jso)) {
+				if(this.secService.isActivo(jso.getString("correoAcceso"))){
+					String response = this.pedidoService.consultarPedidosPre();
+					return new ResponseEntity<>(response, HttpStatus.OK);
+				}
+				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
 			}
 			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		} catch (Exception e) {
