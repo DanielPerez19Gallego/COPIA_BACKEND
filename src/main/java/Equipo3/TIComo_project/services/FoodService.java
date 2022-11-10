@@ -129,13 +129,13 @@ public class FoodService {
 		String nombreRestaurante = jso.getString("nombreRestaurante");
 		String idPlato = jso.getString("idPlato");
 		//List <Plate> plato = this.platoDAO.findByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);//id aqui
-		List <Plate> plato = this.platoDAO.findByidPlato(idPlato);
-		if (plato.isEmpty())
+		Plate plato = this.platoDAO.findByidPlato(idPlato);
+		if (plato == null)
 			return "noexiste";
 		if (this.existePlatoenRestaurante(nombreNuevo, nombreRestaurante) && !nombreNuevo.equals(nombreViejo)) 
 			return this.nombre;
 		
-		Plate platt = this.crearPlatoAux(jso, plato.get(0));
+		Plate platt = this.crearPlatoAux(jso, plato);
 		
 		//this.platoDAO.deleteByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);//id aqui
 		this.platoDAO.deleteByidPlato(idPlato);
@@ -163,8 +163,8 @@ public class FoodService {
 
 	public String eliminarPlato(JSONObject jso) {
         String idPlato = jso.getString("idPlato");
-        List<Plate> listt = this.platoDAO.findByidPlato(idPlato);
-        if (listt.isEmpty())
+        Plate plato = this.platoDAO.findByidPlato(idPlato);
+        if (plato == null)
             return this.nombre;
         this.platoDAO.deleteByidPlato(idPlato);
         return "Plato eliminado correctamente";
@@ -173,7 +173,7 @@ public class FoodService {
 	public String listaPlatos(String[] plates) {
 		StringBuilder bld = new StringBuilder();
 		for(int i=0; i<plates.length;i++) {
-			Plate platoo = this.platoDAO.findByidPlato(plates[i]).get(0);
+			Plate platoo = this.platoDAO.findByidPlato(plates[i]);
 			JSONObject jso = platoo.toJSON();
 			if (i == plates.length - 1)
 				bld.append(jso.toString());
@@ -181,6 +181,18 @@ public class FoodService {
 				bld.append(jso.toString() + ";;");
 		}
 		return bld.toString();
+	}
+	
+	public float precioPlatos(String platos) {
+		String[] arrayPlatos = platos.split(",");
+		float precio = 0;
+		for (int i =0; i<arrayPlatos.length; i++) {
+			Plate plato = this.platoDAO.findByidPlato(arrayPlatos[i]);
+			if (plato != null) {
+				precio = precio + Float.parseFloat(plato.getPrecio());
+			}
+		}
+		return precio;
 	}
 
 }
