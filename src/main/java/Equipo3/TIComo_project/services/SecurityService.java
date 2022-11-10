@@ -31,8 +31,10 @@ public class SecurityService {
 
 	private String clave = "TICOMO_3";
 
+	@Autowired
 	private ClientRepository clientDAO;
-
+	
+	@Autowired
 	private RiderRepository riderDAO;
 
 	public String[] comprobarPassword(JSONObject info) {
@@ -67,15 +69,15 @@ public class SecurityService {
 	}
 
 	public boolean accesoAdmin(JSONObject json){
-		return tieneAcceso(json, json.getString("rol"));
+		return tieneAcceso(json, "admin");
 	}
 
 	public boolean accesoCliente(JSONObject json){
-		return tieneAcceso(json, json.getString("rol"));
+		return tieneAcceso(json, "client");
 	}
 	
 	public boolean accesoRider(JSONObject json) {
-		return tieneAcceso(json, json.getString("rol"));
+		return tieneAcceso(json, "rider");
 	}
 	
 	public boolean tieneAcceso(JSONObject json, String rol) {
