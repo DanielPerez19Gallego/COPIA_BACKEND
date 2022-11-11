@@ -53,13 +53,13 @@ public class PedidoController {
 	}
 
 	@CrossOrigin
-	@PostMapping("/consultarPedidosCliente/{cliente}")
-	public ResponseEntity<String> consultarPedidosCliente(@RequestBody Map<String, Object> info, @PathVariable String cliente) {
+	@PostMapping("/consultarPedidosCliente")
+	public ResponseEntity<String> consultarPedidosCliente(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			if (this.secService.accesoCliente(jso)) {
 				if(this.secService.isActivo(jso.getString(this.correoAcceso))){
-					String response = this.pedidoService.consultarPedidosCliente(cliente);
+					String response = this.pedidoService.consultarPedidosCliente(jso.getString(this.correoAcceso));
 					if (!response.equals(""))
 						return new ResponseEntity<>(response, HttpStatus.OK);
 					return new ResponseEntity<>(this.noHay, HttpStatus.OK);
@@ -107,13 +107,13 @@ public class PedidoController {
 	}
 	
 	@CrossOrigin
-	@PostMapping("/consultarPedidosRider/{rider}")
-	public ResponseEntity<String> consultarPedidosRider(@RequestBody Map<String, Object> info, @PathVariable String rider) {
+	@PostMapping("/consultarPedidosRider")
+	public ResponseEntity<String> consultarPedidosRider(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			if (this.secService.accesoRider(jso)) {
 				if(this.secService.isActivo(jso.getString(this.correoAcceso))){
-					String response = this.pedidoService.consultarPedidosRider(rider);
+					String response = this.pedidoService.consultarPedidosRider(jso.getString(this.correoAcceso));
 					if (!response.equals(""))
 						return new ResponseEntity<>(response, HttpStatus.OK);
 					return new ResponseEntity<>(this.noHay, HttpStatus.OK);
@@ -202,7 +202,7 @@ public class PedidoController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
-	
+
 	@CrossOrigin
 	@PostMapping("/consultarValoracionRestaurante")
 	public ResponseEntity<String> consultarValoracionRestaurante(@RequestBody Map<String, Object> info) {
