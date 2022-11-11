@@ -24,7 +24,7 @@ public class FoodService {
 
 	@Autowired
 	private SecurityService secService;
-	
+
 	public String crearRestaurante(JSONObject jso) {
 
 		Restaurant resNombre = this.restDAO.findByNombre(jso.getString(this.nombre));
@@ -107,13 +107,13 @@ public class FoodService {
 		platoDAO.save(pla);
 		return "Plato creado correctamente";
 	}
-	
+
 	public boolean existePlatoenRestaurante(String nombreP, String nombreR) {
 		List <Plate> platos = this.platoDAO.findByNombreAndNombreRestaurante(nombreP, nombreR);
 		return !platos.isEmpty();
-			
+
 	}
-	
+
 	public Plate crearPlatoAux(JSONObject jso, Plate pla) {
 		pla.setAptoVegano(Boolean.valueOf(jso.getString("aptoVegano")));
 		pla.setDescripcion(jso.getString("descripcion"));
@@ -122,7 +122,7 @@ public class FoodService {
 		pla.setFoto(jso.getString("foto"));
 		return pla;
 	}
-	
+
 	public String actualizarPlato(JSONObject jso) {
 		String nombreViejo = jso.getString("nombreViejo");
 		String nombreNuevo = jso.getString(this.nombre);
@@ -134,13 +134,13 @@ public class FoodService {
 			return "noexiste";
 		if (this.existePlatoenRestaurante(nombreNuevo, nombreRestaurante) && !nombreNuevo.equals(nombreViejo)) 
 			return this.nombre;
-		
+
 		Plate platt = this.crearPlatoAux(jso, plato);
-		
+
 		//this.platoDAO.deleteByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);//id aqui
 		this.platoDAO.deleteByidPlato(idPlato);
 		this.platoDAO.save(platt);
-		
+
 		return "Plato actualizado correctamente";
 	}
 
@@ -162,14 +162,15 @@ public class FoodService {
 	}
 
 	public String eliminarPlato(JSONObject jso) {
-        String idPlato = jso.getString("idPlato");
-        Plate plato = this.platoDAO.findByidPlato(idPlato);
-        if (plato == null)
-            return this.nombre;
-        this.platoDAO.deleteByidPlato(idPlato);
-        return "Plato eliminado correctamente";
-   }
+		String idPlato = jso.getString("idPlato");
+		Plate plato = this.platoDAO.findByidPlato(idPlato);
+		if (plato == null)
+			return this.nombre;
+		this.platoDAO.deleteByidPlato(idPlato);//mirarSiexitepedidos
+		return "Plato eliminado correctamente";
 
+	}
+	/*
 	public String listaPlatos(String[] plates) {
 		StringBuilder bld = new StringBuilder();
 		for(int i=0; i<plates.length;i++) {
@@ -182,14 +183,14 @@ public class FoodService {
 		}
 		return bld.toString();
 	}
-	
+	 */
 	public float precioPlatos(String platos) {
-		String[] arrayPlatos = platos.split(",");
+		String[] arrayPlatos = platos.split(";");
 		float precio = 0;
 		for (int i =0; i<arrayPlatos.length; i++) {
-			Plate plato = this.platoDAO.findByidPlato(arrayPlatos[i]);
+			String[] plato = arrayPlatos[i].split(",");
 			if (plato != null) {
-				precio = precio + Float.parseFloat(plato.getPrecio());
+				precio = precio + (Float.parseFloat(plato[1])*(Float.parseFloat(plato[2])));
 			}
 		}
 		return precio;
