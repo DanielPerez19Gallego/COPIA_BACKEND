@@ -23,5 +23,5 @@ steps:
     targetType: 'inline'
     script: |
       git checkout $(Build.SourceBranchName)
-      git remote add heroku https://heroku:$(pat)@git.heroku.com/ticomobackendgit.git
+      git remote add heroku https://heroku:91627db1-0ae8-4e20-aff8-0c2305f50fd7@git.heroku.com/ticomobackendgit.git
       git push heroku $(Build.SourceBranchName)
