@@ -21,5 +21,5 @@ steps:
 - task: PushToHeroku@0
   inputs:
     ApiKey: '5edcb810-603c-4582-b4a6-77693b28eaa5'
-    AppName: 'ticomobackend'
+    AppName: 'ticomobackendgit'
     PushRoot: '.'
