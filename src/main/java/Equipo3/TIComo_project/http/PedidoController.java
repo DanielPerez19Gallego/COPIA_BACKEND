@@ -51,6 +51,24 @@ public class PedidoController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+	
+	@CrossOrigin
+	@PostMapping("/cancelarPedido/{idPedido}")
+	public ResponseEntity<String> cancelarPedido(@RequestBody Map<String, Object> info, @PathVariable String idPedido) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoCliente(jso)) {
+				String correoCliente = jso.getString(this.correoAcceso);
+				if(this.secService.isActivo(correoCliente)){
+					return new ResponseEntity<>(this.pedidoService.cancelarPedido(idPedido, correoCliente), HttpStatus.OK);
+				}
+				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
 
 	@CrossOrigin
 	@PostMapping("/consultarPedidosCliente")
@@ -208,7 +226,7 @@ public class PedidoController {
 	public ResponseEntity<String> consultarValoracionRestaurante(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
-			if (this.secService.accesoAdmin(jso)) {
+			if (this.secService.accesoAdmin(jso) || (this.secService.accesoCliente(jso) && this.secService.isActivo(jso.getString(this.correoAcceso)))) {
 				String response = this.pedidoService.consultarValoracionRes(jso.getString("restaurante"));
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
