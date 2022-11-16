@@ -166,24 +166,11 @@ public class FoodService {
 		Plate plato = this.platoDAO.findByidPlato(idPlato);
 		if (plato == null)
 			return this.nombre;
-		this.platoDAO.deleteByidPlato(idPlato);//mirarSiexitepedidos
+		this.platoDAO.deleteByidPlato(idPlato);
 		return "Plato eliminado correctamente";
 
 	}
-	/*
-	public String listaPlatos(String[] plates) {
-		StringBuilder bld = new StringBuilder();
-		for(int i=0; i<plates.length;i++) {
-			Plate platoo = this.platoDAO.findByidPlato(plates[i]);
-			JSONObject jso = platoo.toJSON();
-			if (i == plates.length - 1)
-				bld.append(jso.toString());
-			else
-				bld.append(jso.toString() + ";;");
-		}
-		return bld.toString();
-	}
-	 */
+	
 	public float precioPlatos(String platos) {
 		String[] arrayPlatos = platos.split(";");
 		float precio = 0;

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import Equipo3.TIComo_project.dao.PedidoRepository;
 import Equipo3.TIComo_project.dao.RestaurantRepository;
+import Equipo3.TIComo_project.dao.RiderRepository;
 import Equipo3.TIComo_project.dao.ValoracionRepository;
 import Equipo3.TIComo_project.model.Pedido;
 import Equipo3.TIComo_project.model.Valoracion;
@@ -27,22 +28,13 @@ public class PedidoService {
 	private RestaurantRepository resDAO;
 	
 	@Autowired
+	private RiderRepository ridDAO;
+	
+	@Autowired
 	private FoodService foodService;
 	
 	private String noexiste = "No existe ese pedido";
-/*
-	public boolean existePlatoPedido(String idPlato) {
-		List<Pedido> pedidos = this.pioDAO.findAll();
-		if(!pedidos.isEmpty()) {
-			for (int i=0;i<pedidos.size();i++) {
-				Pedido ped = pedidos.get(i);
-				if(Arrays.asList(ped.getPlatos().split(",")).contains(idPlato))
-					return true;
-			}
-		}
-		return false;
-	}
-*/
+
 	public String crearPedido(JSONObject jso) {
 		Pedido pedido = new Pedido();
 		String res = jso.getString("restaurante");
@@ -58,7 +50,31 @@ public class PedidoService {
 			return "Pedido creado correctamente";
 		}
 		return "No existe restaurante con ese nombre";
-		
+	}
+	
+	public String cancelarPedido(String idPedido, String cliente) {
+		Pedido pedi = this.pioDAO.findByidPedido(idPedido);
+		if (pedi != null) {
+			if(pedi.getEstado() != 0)
+				return "Ya no puedes cancelar el pedido";
+			if(pedi.getCliente().equals(cliente))
+				return "No puedes cancelar el pedido, no es tuyo";
+			this.pioDAO.deleteByidPedido(idPedido);
+			return "Pedido cancelado";
+		}
+		return this.noexiste;
+	}
+	
+	public String actualizarPedido(String idPedido, String cliente) {
+		Pedido pedi = this.pioDAO.findByidPedido(idPedido);
+		if (pedi != null) {
+			if(pedi.getEstado() != 0)
+				return "Ya no puedes actualizar el pedido";
+			if(pedi.getCliente().equals(cliente))
+				return "No puedes actualizar el pedido, no es tuyo";
+			//implentacion de esto q tiene su miga
+		}
+		return this.noexiste;
 	}
 	
 	public String consultarPedidosCliente(String cliente) {
@@ -92,8 +108,6 @@ public class PedidoService {
 			for (int i = 0; i<listaPedidos.size(); i++) {
 				Pedido pedi= listaPedidos.get(i);
 				JSONObject jso = pedi.toJSON();
-				//String[] plates = jso.getString("platos").split(";");
-				//jso.put("platos", this.foodService.listaPlatos(plates));
 				if (i == listaPedidos.size() - 1)
 					bld.append(jso.toString());
 				else
@@ -108,7 +122,7 @@ public class PedidoService {
 		Pedido pedi = this.pioDAO.findByidPedido(idPedido);
 		if (pedi!=null) {
 			if (pedi.getEstado() == 1)
-				return "Pedido ya asignado";
+				return "El pedido ya se ha asignado";
 			else if (pedi.getEstado() == 2)
 				return "El pedido ya se ha entregado";
 			pedi.setEstado(1);
@@ -148,17 +162,15 @@ public class PedidoService {
 	}
 	
 	public String consultarValoracionRes(String nombreRes) {
-		String valoraciones = consultarValoracion(nombreRes);//añadir que exista el res
-		if (valoraciones.equals(""))
-			return "El restaurante no tiene valoraciones";
-		return valoraciones;
+		if(this.resDAO.findByNombre(nombreRes) == null)
+			return "No existe ese resturante";
+		return consultarValoracion(nombreRes);
 	}
 	
 	public String consultarValoracionRider(String rider) {
-		String valoraciones = consultarValoracion(rider);//añadir que exista el rider
-		if (valoraciones.equals(""))
-			return "El rider no tiene valoraciones";
-		return valoraciones;
+		if(this.ridDAO.findByCorreo(rider) == null)
+			return "No existe ese rider";
+		return consultarValoracion(rider);
 	}
 	
 	public String consultarValoracion(String entidad) {
@@ -171,11 +183,11 @@ public class PedidoService {
 				if (i == valoraciones.size() - 1)
 					bld.append(jso.toString());
 				else
-					bld.append(jso.toString() + ";;");
+					bld.append(jso.toString() + ";;;");
 			}
 			return bld.toString();
 		}
-		return "";
+		return entidad + " no tiene valoraciones";
 	}
 	
 	public String consultarFacturacion(JSONObject jso) {
@@ -186,9 +198,8 @@ public class PedidoService {
 			List<Pedido> pedidos = this.pioDAO.findAllByRestaurante(nombreRes);
 			if (!pedidos.isEmpty()) {
 				List<Pedido> pedidosValidos = pedidosEntre(fechaInicio, fechaFinal, pedidos);
-				if (!pedidosValidos.isEmpty()) {
-					return "Facturacion:" + calcularFacturacion(pedidosValidos);
-				}
+				if (!pedidosValidos.isEmpty()) 
+					return "Facturacion: " + calcularFacturacion(pedidosValidos);
 				return "No hay pedidos entre esas fechas";
 			}
 			return "El restaurante no tiene pedidos";
@@ -219,4 +230,5 @@ public class PedidoService {
 		}
 		return pedidosValidos;
 	}
+
 }
