@@ -18,10 +18,8 @@ steps:
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
 
-- task: PowerShell@2
+- task: PushToHeroku@0
   inputs:
-    targetType: 'inline'
-    script: |
-      git checkout $(Build.SourceBranchName)
-      git remote add heroku https://heroku:91627db1-0ae8-4e20-aff8-0c2305f50fd7@git.heroku.com/ticomobackendgit.git
-      git push heroku $(Build.SourceBranchName)
+    ApiKey: '5edcb810-603c-4582-b4a6-77693b28eaa5'
+    AppName: 'ticomobackend'
+    PushRoot: '.'
