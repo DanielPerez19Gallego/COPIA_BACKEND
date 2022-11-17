@@ -34,6 +34,7 @@ public class PedidoService {
 	private FoodService foodService;
 	
 	private String noexiste = "No existe ese pedido";
+	private String noexisteRes = "No existe ese restaurante";
 
 	public String crearPedido(JSONObject jso) {
 		Pedido pedido = new Pedido();
@@ -49,7 +50,7 @@ public class PedidoService {
 			this.pioDAO.save(pedido);
 			return "Pedido creado correctamente";
 		}
-		return "No existe restaurante con ese nombre";
+		return this.noexisteRes;
 	}
 	
 	public String cancelarPedido(String idPedido, String cliente) {
@@ -89,7 +90,7 @@ public class PedidoService {
 	
 	public String consultarPedidosPre(String restaurante) {
 		if(this.resDAO.findByNombre(restaurante) == null)
-			return "No existe ese restaurante";
+			return this.noexisteRes;
 		List<Pedido> listaPedidos = this.pioDAO.findAllByRestauranteAndEstado(restaurante, 0);
 		return consultarPedidos(listaPedidos);
 	}
@@ -101,8 +102,13 @@ public class PedidoService {
 	
 	public String consultarPedidosRes(String restaurante) {
 		if(this.resDAO.findByNombre(restaurante) == null)
-			return "No existe ese restaurante";
+			return this.noexisteRes;
 		List<Pedido> listaPedidos = this.pioDAO.findAllByRestaurante(restaurante);
+		return consultarPedidos(listaPedidos);
+	}
+	
+	public String consultarPedidosEn(String rider) {
+		List<Pedido> listaPedidos = this.pioDAO.findAllByEstadoAndRider(1, rider);
 		return consultarPedidos(listaPedidos);
 	}
 	
@@ -167,7 +173,7 @@ public class PedidoService {
 	
 	public String consultarValoracionRes(String nombreRes) {
 		if(this.resDAO.findByNombre(nombreRes) == null)
-			return "No existe ese resturante";
+			return this.noexisteRes;
 		return consultarValoracion(nombreRes);
 	}
 	
@@ -208,7 +214,7 @@ public class PedidoService {
 			}
 			return "El restaurante no tiene pedidos";
 		}
-		return "No existe ese restaurante";
+		return this.noexisteRes;
 	}
 	
 	public float calcularFacturacion(List<Pedido> pedidosValidos) {
