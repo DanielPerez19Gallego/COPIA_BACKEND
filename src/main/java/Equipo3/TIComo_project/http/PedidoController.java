@@ -125,18 +125,15 @@ public class PedidoController {
 	}
 	
 	@CrossOrigin
-	@PostMapping("/consultarPedidosRider")
-	public ResponseEntity<String> consultarPedidosRider(@RequestBody Map<String, Object> info) {
+	@PostMapping("/consultarPedidosRider/{rider}")
+	public ResponseEntity<String> consultarPedidosRider(@RequestBody Map<String, Object> info, @PathVariable String rider) {
 		try {
 			JSONObject jso = new JSONObject(info);
-			if (this.secService.accesoRider(jso)) {
-				if(this.secService.isActivo(jso.getString(this.correoAcceso))){
-					String response = this.pedidoService.consultarPedidosRider(jso.getString(this.correoAcceso));
-					if (!response.equals(""))
-						return new ResponseEntity<>(response, HttpStatus.OK);
-					return new ResponseEntity<>(this.noHay, HttpStatus.OK);
-				}
-				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
+			if (this.secService.accesoAdmin(jso)) {
+				String response = this.pedidoService.consultarPedidosRider(rider);
+				if (!response.equals(""))
+					return new ResponseEntity<>(response, HttpStatus.OK);
+				return new ResponseEntity<>(this.noHay, HttpStatus.OK);
 			}
 			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		} catch (Exception e) {
@@ -152,6 +149,27 @@ public class PedidoController {
 			if (this.secService.accesoRider(jso)) {
 				if(this.secService.isActivo(jso.getString(this.correoAcceso))){
 					String response = this.pedidoService.consultarPedidosPre(restaurante);
+					if (!response.equals(""))
+						return new ResponseEntity<>(response, HttpStatus.OK);
+					return new ResponseEntity<>(this.noHay, HttpStatus.OK);
+				}
+				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	@CrossOrigin
+	@PostMapping("/consultarPedidosEnRider")
+	public ResponseEntity<String> consultarPedidosEn(@RequestBody Map<String, Object> info) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoRider(jso)) {
+				String rider = jso.getString(this.correoAcceso);
+				if(this.secService.isActivo(rider)){
+					String response = this.pedidoService.consultarPedidosEn(rider);
 					if (!response.equals(""))
 						return new ResponseEntity<>(response, HttpStatus.OK);
 					return new ResponseEntity<>(this.noHay, HttpStatus.OK);
