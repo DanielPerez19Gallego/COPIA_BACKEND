@@ -18,4 +18,7 @@ public interface PedidoRepository extends MongoRepository <Pedido, String> {
 	
 	@Query(value = "{ 'restaurante' : ?0, 'estado' : ?1 }")
 	List <Pedido> findAllByRestauranteAndEstado(String restaurante, int estado);
+	
+	@Query(value = "{ 'estado' : ?0, 'rider' : ?1 }")
+	List <Pedido> findAllByEstadoAndRider(int estado, String rider);
 }
