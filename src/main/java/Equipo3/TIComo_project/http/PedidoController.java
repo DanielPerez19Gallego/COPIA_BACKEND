@@ -145,13 +145,13 @@ public class PedidoController {
 	}
 	
 	@CrossOrigin
-	@PostMapping("/consultarPedidosPre")
-	public ResponseEntity<String> consultarPedidosPre(@RequestBody Map<String, Object> info) {
+	@PostMapping("/consultarPedidosPreRider/{restaurante}")
+	public ResponseEntity<String> consultarPedidosPre(@RequestBody Map<String, Object> info, @PathVariable String restaurante) {
 		try {
 			JSONObject jso = new JSONObject(info);
 			if (this.secService.accesoRider(jso)) {
 				if(this.secService.isActivo(jso.getString(this.correoAcceso))){
-					String response = this.pedidoService.consultarPedidosPre();
+					String response = this.pedidoService.consultarPedidosPre(restaurante);
 					if (!response.equals(""))
 						return new ResponseEntity<>(response, HttpStatus.OK);
 					return new ResponseEntity<>(this.noHay, HttpStatus.OK);
@@ -235,7 +235,7 @@ public class PedidoController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
-	
+
 	@CrossOrigin
 	@PostMapping("/consultarValoracionRider")
 	public ResponseEntity<String> consultarValoracionRider(@RequestBody Map<String, Object> info) {
