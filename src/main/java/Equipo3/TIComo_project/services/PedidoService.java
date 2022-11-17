@@ -87,8 +87,10 @@ public class PedidoService {
 		return consultarPedidos(listaPedidos);
 	}
 	
-	public String consultarPedidosPre() {
-		List<Pedido> listaPedidos = this.pioDAO.findAllByEstado(0);
+	public String consultarPedidosPre(String restaurante) {
+		if(this.resDAO.findByNombre(restaurante) == null)
+			return "No existe ese restaurante";
+		List<Pedido> listaPedidos = this.pioDAO.findAllByRestauranteAndEstado(restaurante, 0);
 		return consultarPedidos(listaPedidos);
 	}
 	
@@ -98,6 +100,8 @@ public class PedidoService {
 	}
 	
 	public String consultarPedidosRes(String restaurante) {
+		if(this.resDAO.findByNombre(restaurante) == null)
+			return "No existe ese restaurante";
 		List<Pedido> listaPedidos = this.pioDAO.findAllByRestaurante(restaurante);
 		return consultarPedidos(listaPedidos);
 	}
