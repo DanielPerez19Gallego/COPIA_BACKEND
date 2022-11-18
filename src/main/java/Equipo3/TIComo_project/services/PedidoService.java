@@ -13,6 +13,7 @@ import Equipo3.TIComo_project.dao.RestaurantRepository;
 import Equipo3.TIComo_project.dao.RiderRepository;
 import Equipo3.TIComo_project.dao.ValoracionRepository;
 import Equipo3.TIComo_project.model.Pedido;
+import Equipo3.TIComo_project.model.Restaurant;
 import Equipo3.TIComo_project.model.Valoracion;
 
 @Service
@@ -243,5 +244,27 @@ public class PedidoService {
 		}
 		return pedidosValidos;
 	}
+
+	public String consultarMedia(String restaurante) {
+		Restaurant res = this.resDAO.findByNombre(restaurante);
+		if(res == null)
+			return this.noexisteRes;
+		List<Valoracion> valoraciones = this.valDAO.findAllByEntidad(restaurante);
+		if (valoraciones.isEmpty())
+			return "El restaurante no tiene valoraciones";
+		List<Integer> valores = new ArrayList<>();
+		for (int i=0; i<valoraciones.size(); i++) {
+			valores.add(valoraciones.get(i).getValor());
+		}
+		double media = getAverage(valores); 
+		return ""+media;
+		
+	}
+	
+	public double getAverage(List<Integer> list) {
+        return list.stream()
+                .mapToInt(a -> a)
+                .average().orElse(0);
+    }
 
 }
