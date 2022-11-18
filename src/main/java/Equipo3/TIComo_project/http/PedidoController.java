@@ -228,8 +228,7 @@ public class PedidoController {
 			if (this.secService.accesoCliente(jso)) {
 				String correoAccesoo = jso.getString(this.correoAcceso);
 				if(this.secService.isActivo(correoAccesoo)){
-					this.pedidoService.hacerValoracion(jso);
-					return new ResponseEntity<>("Valoracion realizada", HttpStatus.OK);
+					return new ResponseEntity<>(this.pedidoService.hacerValoracion(jso), HttpStatus.OK);
 				}
 				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
 			}
@@ -244,11 +243,8 @@ public class PedidoController {
 	public ResponseEntity<String> consultarValoracionRestaurante(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
-			if (this.secService.accesoAdmin(jso) || (this.secService.accesoCliente(jso) && this.secService.isActivo(jso.getString(this.correoAcceso)))) {
-				String response = this.pedidoService.consultarValoracionRes(jso.getString("restaurante"));
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
-			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+			String response = this.pedidoService.consultarValoracionRes(jso.getString("restaurante"));
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -259,11 +255,10 @@ public class PedidoController {
 	public ResponseEntity<String> consultarValoracionRider(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
-			if (this.secService.accesoAdmin(jso)) {
-				String response = this.pedidoService.consultarValoracionRider(jso.getString("rider"));
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
-			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+			if(!this.secService.accesoAdmin(jso))
+				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+			String response = this.pedidoService.consultarValoracionRider(jso.getString("rider"));
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
