@@ -108,6 +108,8 @@ public class PedidoService {
 	}
 	
 	public String consultarPedidosEn(String rider) {
+		if(this.ridDAO.findByCorreo(rider) == null)
+			return "No existe ese rider";
 		List<Pedido> listaPedidos = this.pioDAO.findAllByEstadoAndRider(1, rider);
 		return consultarPedidos(listaPedidos);
 	}
@@ -161,7 +163,7 @@ public class PedidoService {
 		return this.noexiste;
 	}
 	
-	public void hacerValoracion(JSONObject jso) {
+	public String hacerValoracion(JSONObject jso) {
 		Valoracion valora = new Valoracion();
 		valora.setAutor(jso.getString("correoAcceso"));
 		valora.setComentario(jso.getString("comentario"));
@@ -169,6 +171,7 @@ public class PedidoService {
 		valora.setFecha();
 		valora.setValor(Integer.parseInt(jso.getString("valor")));
 		this.valDAO.save(valora);
+		return "Valoracion realizada";
 	}
 	
 	public String consultarValoracionRes(String nombreRes) {
@@ -209,7 +212,7 @@ public class PedidoService {
 			if (!pedidos.isEmpty()) {
 				List<Pedido> pedidosValidos = pedidosEntre(fechaInicio, fechaFinal, pedidos);
 				if (!pedidosValidos.isEmpty()) 
-					return "Facturacion: " + calcularFacturacion(pedidosValidos);
+					return ""+ calcularFacturacion(pedidosValidos);
 				return "No hay pedidos entre esas fechas";
 			}
 			return "El restaurante no tiene pedidos";
