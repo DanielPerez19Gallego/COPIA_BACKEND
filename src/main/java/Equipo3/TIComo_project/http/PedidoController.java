@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -229,7 +228,8 @@ public class PedidoController {
 			if (this.secService.accesoCliente(jso)) {
 				String correoAccesoo = jso.getString(this.correoAcceso);
 				if(this.secService.isActivo(correoAccesoo)){
-					return new ResponseEntity<>(this.pedidoService.hacerValoracion(jso), HttpStatus.OK);
+					this.pedidoService.hacerValoracion(jso);
+					return new ResponseEntity<>("Valoracion realizada", HttpStatus.OK);
 				}
 				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
 			}
@@ -244,22 +244,56 @@ public class PedidoController {
 	public ResponseEntity<String> consultarValoracionRestaurante(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
-			String response = this.pedidoService.consultarValoracionRes(jso.getString("restaurante"));
-			return new ResponseEntity<>(response, HttpStatus.OK);
+			if (this.secService.accesoAdmin(jso) || (this.secService.accesoCliente(jso) && this.secService.isActivo(jso.getString(this.correoAcceso)))) {
+				String response = this.pedidoService.consultarValoracionRes(jso.getString("restaurante"));
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	@CrossOrigin
+	@PostMapping("/consultarValoracionRestauranteMedia")
+	public ResponseEntity<String> consultarValoracionRestauranteMedia(@RequestBody Map<String, Object> info) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoAdmin(jso) || (this.secService.accesoCliente(jso) && this.secService.isActivo(jso.getString(this.correoAcceso)))) {
+				String response = this.pedidoService.consultarMedia(jso.getString("restaurante")); 
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
+	@CrossOrigin
+	@PostMapping("/consultarValoracionRider")
+	public ResponseEntity<String> consultarValoracionRider(@RequestBody Map<String, Object> info) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoAdmin(jso)) {
+				String response = this.pedidoService.consultarValoracionRider(jso.getString("rider"));
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
 
 	@CrossOrigin
-	@PostMapping("/consultarValoracionRider")
-	public ResponseEntity<String> consultarValoracionRider(@RequestBody Map<String, Object> info) {
+	@PostMapping("/consultarValoracionRiderMedia")
+	public ResponseEntity<String> consultarValoracionRiderMedia(@RequestBody Map<String, Object> info) {
 		try {
 			JSONObject jso = new JSONObject(info);
-			if(!this.secService.accesoAdmin(jso))
-				return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
-			String response = this.pedidoService.consultarValoracionRider(jso.getString("rider"));
-			return new ResponseEntity<>(response, HttpStatus.OK);
+			if (this.secService.accesoAdmin(jso)) {
+				String response = this.pedidoService.consultarMediaRyder(jso.getString("rider"));
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
@@ -278,15 +312,4 @@ public class PedidoController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
-	
-	@CrossOrigin
-	@GetMapping("/consultarMedia/{restaurante}")
-	public ResponseEntity<String> consultarMedia(@PathVariable String restaurante) {
-		try {
-			return new ResponseEntity<>(this.pedidoService.consultarMedia(restaurante), HttpStatus.OK);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-	}
-	
 }

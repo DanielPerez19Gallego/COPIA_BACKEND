@@ -13,8 +13,9 @@ import Equipo3.TIComo_project.dao.RestaurantRepository;
 import Equipo3.TIComo_project.dao.RiderRepository;
 import Equipo3.TIComo_project.dao.ValoracionRepository;
 import Equipo3.TIComo_project.model.Pedido;
-import Equipo3.TIComo_project.model.Restaurant;
 import Equipo3.TIComo_project.model.Valoracion;
+import Equipo3.TIComo_project.model.Restaurant;
+import Equipo3.TIComo_project.model.Rider;
 
 @Service
 public class PedidoService {
@@ -36,6 +37,7 @@ public class PedidoService {
 	
 	private String noexiste = "No existe ese pedido";
 	private String noexisteRes = "No existe ese restaurante";
+	private String noexisteRy = "No existe ese rider";
 
 	public String crearPedido(JSONObject jso) {
 		Pedido pedido = new Pedido();
@@ -109,8 +111,6 @@ public class PedidoService {
 	}
 	
 	public String consultarPedidosEn(String rider) {
-		if(this.ridDAO.findByCorreo(rider) == null)
-			return "No existe ese rider";
 		List<Pedido> listaPedidos = this.pioDAO.findAllByEstadoAndRider(1, rider);
 		return consultarPedidos(listaPedidos);
 	}
@@ -164,7 +164,7 @@ public class PedidoService {
 		return this.noexiste;
 	}
 	
-	public String hacerValoracion(JSONObject jso) {
+	public void hacerValoracion(JSONObject jso) {
 		Valoracion valora = new Valoracion();
 		valora.setAutor(jso.getString("correoAcceso"));
 		valora.setComentario(jso.getString("comentario"));
@@ -172,7 +172,6 @@ public class PedidoService {
 		valora.setFecha();
 		valora.setValor(Integer.parseInt(jso.getString("valor")));
 		this.valDAO.save(valora);
-		return "Valoracion realizada";
 	}
 	
 	public String consultarValoracionRes(String nombreRes) {
@@ -213,7 +212,7 @@ public class PedidoService {
 			if (!pedidos.isEmpty()) {
 				List<Pedido> pedidosValidos = pedidosEntre(fechaInicio, fechaFinal, pedidos);
 				if (!pedidosValidos.isEmpty()) 
-					return ""+ calcularFacturacion(pedidosValidos);
+					return "Facturacion: " + calcularFacturacion(pedidosValidos);
 				return "No hay pedidos entre esas fechas";
 			}
 			return "El restaurante no tiene pedidos";
@@ -258,9 +257,25 @@ public class PedidoService {
 		}
 		double media = getAverage(valores); 
 		return ""+media;
-		
+
 	}
 	
+	public String consultarMediaRyder(String ryder) {
+		Rider ri = this.ridDAO.findByCorreo(ryder);
+		if(ri == null)
+			return this.noexisteRy;
+		List<Valoracion> valoraciones = this.valDAO.findAllByEntidad(ryder);
+		if (valoraciones.isEmpty())
+			return "El rider no tiene valoraciones";
+		List<Integer> valores = new ArrayList<>();
+		for (int i=0; i<valoraciones.size(); i++) {
+			valores.add(valoraciones.get(i).getValor());
+		}
+		double media = getAverage(valores); 
+		return ""+media;
+
+	}
+
 	public double getAverage(List<Integer> list) {
         return list.stream()
                 .mapToInt(a -> a)
