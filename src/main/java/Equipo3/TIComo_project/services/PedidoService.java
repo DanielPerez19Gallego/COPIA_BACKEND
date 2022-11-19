@@ -61,7 +61,7 @@ public class PedidoService {
 		if (pedi != null) {
 			if(pedi.getEstado() != 0)
 				return "Ya no puedes cancelar el pedido";
-			if(pedi.getCliente().equals(cliente))
+			if(!pedi.getCliente().equals(cliente))
 				return "No puedes cancelar el pedido, no es tuyo";
 			this.pioDAO.deleteByidPedido(idPedido);
 			return "Pedido cancelado";
