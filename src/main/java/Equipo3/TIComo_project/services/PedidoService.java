@@ -14,6 +14,7 @@ import Equipo3.TIComo_project.dao.RiderRepository;
 import Equipo3.TIComo_project.dao.ValoracionRepository;
 import Equipo3.TIComo_project.model.Pedido;
 import Equipo3.TIComo_project.model.Restaurant;
+import Equipo3.TIComo_project.model.Rider;
 import Equipo3.TIComo_project.model.Valoracion;
 
 @Service
@@ -36,6 +37,7 @@ public class PedidoService {
 	
 	private String noexiste = "No existe ese pedido";
 	private String noexisteRes = "No existe ese restaurante";
+	private String noexisteRy = "No existe ese rider";
 
 	public String crearPedido(JSONObject jso) {
 		Pedido pedido = new Pedido();
@@ -63,18 +65,6 @@ public class PedidoService {
 				return "No puedes cancelar el pedido, no es tuyo";
 			this.pioDAO.deleteByidPedido(idPedido);
 			return "Pedido cancelado";
-		}
-		return this.noexiste;
-	}
-	
-	public String actualizarPedido(String idPedido, String cliente) {
-		Pedido pedi = this.pioDAO.findByidPedido(idPedido);
-		if (pedi != null) {
-			if(pedi.getEstado() != 0)
-				return "Ya no puedes actualizar el pedido";
-			if(pedi.getCliente().equals(cliente))
-				return "No puedes actualizar el pedido, no es tuyo";
-			//implentacion de esto q tiene su miga
 		}
 		return this.noexiste;
 	}
@@ -110,7 +100,7 @@ public class PedidoService {
 	
 	public String consultarPedidosEn(String rider) {
 		if(this.ridDAO.findByCorreo(rider) == null)
-			return "No existe ese rider";
+			return this.noexisteRy;
 		List<Pedido> listaPedidos = this.pioDAO.findAllByEstadoAndRider(1, rider);
 		return consultarPedidos(listaPedidos);
 	}
@@ -183,7 +173,7 @@ public class PedidoService {
 	
 	public String consultarValoracionRider(String rider) {
 		if(this.ridDAO.findByCorreo(rider) == null)
-			return "No existe ese rider";
+			return this.noexisteRy;
 		return consultarValoracion(rider);
 	}
 	
@@ -259,6 +249,22 @@ public class PedidoService {
 		double media = getAverage(valores); 
 		return ""+media;
 		
+	}
+	
+	public String consultarMediaRyder(String ryder) {
+		Rider ri = this.ridDAO.findByCorreo(ryder);
+		if(ri == null)
+			return this.noexisteRy;
+		List<Valoracion> valoraciones = this.valDAO.findAllByEntidad(ryder);
+		if (valoraciones.isEmpty())
+			return "El rider no tiene valoraciones";
+		List<Integer> valores = new ArrayList<>();
+		for (int i=0; i<valoraciones.size(); i++) {
+			valores.add(valoraciones.get(i).getValor());
+		}
+		double media = getAverage(valores); 
+		return ""+media;
+
 	}
 	
 	public double getAverage(List<Integer> list) {

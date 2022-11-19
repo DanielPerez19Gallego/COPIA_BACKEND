@@ -289,4 +289,19 @@ public class PedidoController {
 		}
 	}
 	
+	@CrossOrigin
+	@PostMapping("/consultarValoracionRiderMedia")
+	public ResponseEntity<String> consultarValoracionRiderMedia(@RequestBody Map<String, Object> info) {
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoAdmin(jso)) {
+				String response = this.pedidoService.consultarMediaRyder(jso.getString("rider"));
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
 }
