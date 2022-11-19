@@ -447,11 +447,11 @@ class TiComoProjectApplicationTests {
 		assertEquals("", pioService.consultarPedidosRider("noexiste"));
 		assertNotSame("", pioService.consultarPedidosRider("rider@rider.com"));
 	}
-	/*
+	
 	void consultarPedidosEnTest() throws JSONException {
 		assertEquals("No existe ese rider", pioService.consultarPedidosEn("noexiste"));
-		assertNotSame("", pioService.consultarPedidosEn("rider@rider.com"));
-	}*/
+		assertNotSame("", pioService.consultarPedidosEn("rider1@rider1.com"));
+	}
 	
 	void consultarValoracionResTest() throws JSONException {
 		String nombreRes = "PruebaRe";
@@ -512,6 +512,7 @@ class TiComoProjectApplicationTests {
 		assertEquals("No existe ese pedido", pioService.ponerEntregado(idPedido, rider));
 		idPedido = "0d605f33-f6e5-4669-b385-163449426025";
 		assertEquals("Rider asignado", pioService.asignarRider(idPedido, rider));
+		this.consultarPedidosEnTest();
 		assertEquals("El pedido ya se ha asignado", pioService.asignarRider(idPedido, rider));
 		assertEquals("No te corresponde entregar este pedido", pioService.ponerEntregado(idPedido, "rider@rider.com"));
 		assertEquals("Pedido entregado", pioService.ponerEntregado(idPedido, rider));
