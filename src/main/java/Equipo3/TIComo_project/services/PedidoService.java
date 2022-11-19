@@ -69,18 +69,6 @@ public class PedidoService {
 		return this.noexiste;
 	}
 	
-	public String actualizarPedido(String idPedido, String cliente) {
-		Pedido pedi = this.pioDAO.findByidPedido(idPedido);
-		if (pedi != null) {
-			if(pedi.getEstado() != 0)
-				return "Ya no puedes actualizar el pedido";
-			if(pedi.getCliente().equals(cliente))
-				return "No puedes actualizar el pedido, no es tuyo";
-			//implentacion de esto q tiene su miga
-		}
-		return this.noexiste;
-	}
-	
 	public String consultarPedidosCliente(String cliente) {
 		List<Pedido> listaPedidos = this.pioDAO.findAllByCliente(cliente);
 		return consultarPedidos(listaPedidos);
@@ -112,7 +100,7 @@ public class PedidoService {
 	
 	public String consultarPedidosEn(String rider) {
 		if(this.ridDAO.findByCorreo(rider) == null)
-			return "No existe ese rider";
+			return this.noexisteRy;
 		List<Pedido> listaPedidos = this.pioDAO.findAllByEstadoAndRider(1, rider);
 		return consultarPedidos(listaPedidos);
 	}
@@ -185,7 +173,7 @@ public class PedidoService {
 	
 	public String consultarValoracionRider(String rider) {
 		if(this.ridDAO.findByCorreo(rider) == null)
-			return "No existe ese rider";
+			return this.noexisteRy;
 		return consultarValoracion(rider);
 	}
 	
