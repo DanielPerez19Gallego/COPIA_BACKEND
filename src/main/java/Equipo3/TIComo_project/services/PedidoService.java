@@ -14,6 +14,7 @@ import Equipo3.TIComo_project.dao.RiderRepository;
 import Equipo3.TIComo_project.dao.ValoracionRepository;
 import Equipo3.TIComo_project.model.Pedido;
 import Equipo3.TIComo_project.model.Restaurant;
+import Equipo3.TIComo_project.model.Rider;
 import Equipo3.TIComo_project.model.Valoracion;
 
 @Service
@@ -36,6 +37,7 @@ public class PedidoService {
 	
 	private String noexiste = "No existe ese pedido";
 	private String noexisteRes = "No existe ese restaurante";
+	private String noexisteRy = "No existe ese rider";
 
 	public String crearPedido(JSONObject jso) {
 		Pedido pedido = new Pedido();
@@ -259,6 +261,22 @@ public class PedidoService {
 		double media = getAverage(valores); 
 		return ""+media;
 		
+	}
+	
+	public String consultarMediaRyder(String ryder) {
+		Rider ri = this.ridDAO.findByCorreo(ryder);
+		if(ri == null)
+			return this.noexisteRy;
+		List<Valoracion> valoraciones = this.valDAO.findAllByEntidad(ryder);
+		if (valoraciones.isEmpty())
+			return "El rider no tiene valoraciones";
+		List<Integer> valores = new ArrayList<>();
+		for (int i=0; i<valoraciones.size(); i++) {
+			valores.add(valoraciones.get(i).getValor());
+		}
+		double media = getAverage(valores); 
+		return ""+media;
+
 	}
 	
 	public double getAverage(List<Integer> list) {
