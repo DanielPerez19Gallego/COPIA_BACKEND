@@ -38,6 +38,10 @@ public class UserController {
 	private String sinAcceso = "No tienes acceso a este servicio"; 
 
 	private String noExiste = "No existe ningun usuario en la base de datos";
+	
+	private String correoAcceso = "correoAcceso";
+	
+	private String inActivo = "Tu cuenta no se encuentra activa";
 
 	@CrossOrigin
 	@PostMapping("/login")
@@ -213,5 +217,37 @@ public class UserController {
 	@GetMapping("/pipeline")
 	public ResponseEntity<String> damePipeline() {
 		return new ResponseEntity<>("Hello pipeline!", HttpStatus.OK);
+	}
+	
+	@CrossOrigin
+	@PostMapping("/actualizarUsuarioCliente")
+	public ResponseEntity<String> actualizarCliente(@RequestBody Map<String, Object> info) {
+		JSONObject jso = new JSONObject(info);
+		if (this.secService.accesoCliente(jso)) {
+			if(this.secService.isActivo(jso.getString(this.correoAcceso))){
+				String[] comprobar = this.secService.comprobarPassword(jso);
+				if (Boolean.FALSE.equals(Boolean.valueOf(comprobar[0])))
+					return new ResponseEntity<>(comprobar[1], HttpStatus.OK);
+				if(!this.userService.actualizarUsuarioCliente(jso.getString(this.correoAcceso), jso))
+					return new ResponseEntity<>("No existe ningun usuario en la base de datos", HttpStatus.OK);
+				
+				return new ResponseEntity<>("Cliente actualizado", HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+	}
+	
+	@CrossOrigin
+	@PostMapping("/consultarDatosCliente")
+	public ResponseEntity<String> consultarDatosCliente(@RequestBody Map<String, Object> info) {
+		JSONObject jso = new JSONObject(info);
+		if (this.secService.accesoCliente(jso)) {
+			if(this.secService.isActivo(jso.getString(this.correoAcceso))){
+				return new ResponseEntity<>(this.userService.consultarDatosCliente(jso.getString(this.correoAcceso)), HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
 	}
 }

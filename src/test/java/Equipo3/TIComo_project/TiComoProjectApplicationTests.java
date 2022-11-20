@@ -16,6 +16,7 @@ import Equipo3.TIComo_project.model.Admin;
 import Equipo3.TIComo_project.model.Client;
 import Equipo3.TIComo_project.model.Rider;
 import Equipo3.TIComo_project.services.FoodService;
+import Equipo3.TIComo_project.services.PedidoService;
 import Equipo3.TIComo_project.services.SecurityService;
 import Equipo3.TIComo_project.services.UserService;
 
@@ -26,7 +27,9 @@ class TiComoProjectApplicationTests {
 
 	@Autowired
 	private SecurityService secService;
-
+	
+	@Autowired
+	private PedidoService pioService;
 
 	@Autowired
 	private FoodService food;
@@ -38,7 +41,6 @@ class TiComoProjectApplicationTests {
 		assertEquals("", food.platosParaEnviar("prueba"));
 		this.crearPlatoTest();
 		assertNotSame("", food.platosParaEnviar("prueba"));
-		this.actualizarPlatoTest();
 		this.actualizarRestauranteTest();
 		this.eliminarCartaTest();
 		this.eliminarRestauranteTest();
@@ -72,24 +74,6 @@ class TiComoProjectApplicationTests {
 		assertEquals("nombre", food.crearPlato(jso));
 		jso.put("nombre", "platoPrueba2");
 		assertEquals("Plato creado correctamente", food.crearPlato(jso));
-	}
-
-	void actualizarPlatoTest() throws JSONException {
-		JSONObject jso = new JSONObject();
-		jso.put("nombreViejo", "noexiste");
-		jso.put("aptoVegano", "true");
-		jso.put("descripcion", "cif");
-		jso.put("precio", "ticomo");
-		jso.put("nombreRestaurante", "prueba");
-		jso.put("foto", "ticomo");
-		jso.put("nombre", "Pizza");
-		assertEquals("noexiste", food.actualizarPlato(jso));
-		jso.put("nombreViejo", "platoPrueba2");
-		jso.put("nombre", "platoPrueba1");
-		assertEquals("nombre", food.actualizarPlato(jso));
-		jso.put("nombre", "Pizza");
-		assertEquals("Plato actualizado correctamente", food.actualizarPlato(jso));
-
 	}
 
 	void actualizarRestauranteTest() throws JSONException {
@@ -142,6 +126,7 @@ class TiComoProjectApplicationTests {
 		registro.put("nif", "unNif");
 		registro.put("nombre", "NombrePrueba");
 		assertEquals("Registro completado", user.register(registro));
+		assertEquals(true, secService.isActivo("daniprueba5@gmail"));
 
 		JSONObject registro2 = new JSONObject();
 		registro2.put("correo", "daniprueba5@gmail");
@@ -179,6 +164,7 @@ class TiComoProjectApplicationTests {
 		actualizarUsuario4.put("telefono","12312");
 		actualizarUsuario4.put("apellidos", "apellidos");
 		actualizarUsuario4.put("nombre", "NombrePrueba");
+		actualizarUsuario4.put("activo", "true");
 		assertEquals(true, user.actualizarUsuario(correo4, actualizarUsuario4));
 
 		assertEquals(true, user.actualizarUsuario(correo4, actualizarUsuario4));
@@ -249,9 +235,10 @@ class TiComoProjectApplicationTests {
 		registroParte2.put("nombre", "NombrePrueba");
 		registroParte2.put("carnet", "Moto");
 		registroParte2.put("matricula", "72722DWR");
-		registroParte2.put("tipovehiculo", "coche");
+		registroParte2.put("tipoVehiculo", "coche");
 		registroParte2.put("zona", "SanFran");
 		assertEquals("rider creado correctamente", user.crearUsuario(registroParte2));
+		assertEquals(true, secService.isActivo("riderPrueba2@gmail"));
 
 		//Login rider
 		JSONObject jso = new JSONObject();
@@ -276,6 +263,7 @@ class TiComoProjectApplicationTests {
 		actualizarUsuario2.put("nombre", "asd");
 		actualizarUsuario2.put("apellidos", "asd");
 		actualizarUsuario2.put("nif","telefono");
+		actualizarUsuario2.put("activo", "true");
 		assertEquals(true, user.actualizarUsuario(correoActu, actualizarUsuario2));
 
 		//Eliminar
@@ -327,7 +315,7 @@ class TiComoProjectApplicationTests {
 		registroParte2.put("nombre", "NombrePrueba");
 		registroParte2.put("carnet", "Moto");
 		registroParte2.put("matricula", "72722DWR");
-		registroParte2.put("tipovehiculo", "coche");
+		registroParte2.put("tipoVehiculo", "coche");
 		registroParte2.put("zona", "SanFran");
 		assertEquals("rider creado correctamente", user.crearUsuario(registroParte2));
 
@@ -407,5 +395,147 @@ class TiComoProjectApplicationTests {
 		assertEquals("Usuario eliminado correctamente", user.eliminarUsuario(correo2));
 		assertEquals("correo", user.eliminarUsuario(correo2));
 	}
+	
+	@Test
+	void testPedidos() throws JSONException {
+		this.crearPedidoTest();
+		assertNotSame("", pioService.consultarTodosPedidos());
+		this.consultarPedidosClienteTest();
+		this.consultarPedidosPreResTest();
+		this.consultarPedidosResTest();
+		this.consultarFacturacionTest();
+		this.consultarPedidosRiderTest();
+		this.hacerValoracionTest();
+		this.consultarValoracionResTest();
+		this.consultarValoracionRiderTest();
+		this.consultarValoracionMediaResTest();
+		this.consultarValoracionMediaRiderTest();
+		this.asignarYentregarRiderTest();
+	}
+	
+	void crearPedidoTest() throws JSONException {
+		JSONObject jso = new JSONObject();
+		jso.put("correoAcceso", "nacho@gmail.com");
+		jso.put("passwordAcceso", "Ho123456");
+		jso.put("platos", "hhhhh,10,1;hamburguesa,9,2");
+		jso.put("restaurante", "PruebaRe");
+		assertEquals("No existe ese restaurante", pioService.crearPedido(jso));
+		jso.put("restaurante", "PruebaRes");
+		assertEquals("Pedido creado correctamente", pioService.crearPedido(jso));
+		jso.put("platos", "hhhhh,10,5;hamburguesa,9,1");
+		assertEquals("Pedido creado correctamente", pioService.crearPedido(jso));
+		//jso.put("platos", "Prueba,10,5;hamburguesa,9,1");
+		//assertEquals("Pedido creado correctamente", pioService.crearPedido(jso));
+	}
+	
+	void consultarPedidosClienteTest() throws JSONException {
+		assertEquals("", pioService.consultarPedidosCliente("nacho@gmailcom"));
+		assertNotSame("", pioService.consultarPedidosCliente("nacho@gmail.com"));
+	}
+	
+	void consultarPedidosPreResTest() throws JSONException {
+		assertEquals("No existe ese restaurante", pioService.consultarPedidosPre("noexiste"));
+		assertNotSame("", pioService.consultarPedidosPre("PruebaRes"));
+	}
+	
+	void consultarPedidosResTest() throws JSONException {
+		assertEquals("No existe ese restaurante", pioService.consultarPedidosRes("noexiste"));
+		assertNotSame("", pioService.consultarPedidosRes("PruebaRes"));
+	}
+	
+	void consultarPedidosRiderTest() throws JSONException {
+		assertEquals("", pioService.consultarPedidosRider("noexiste"));
+		assertNotSame("", pioService.consultarPedidosRider("rider@rider.com"));
+	}
+	
+	void consultarPedidosEnTest() throws JSONException {
+		assertEquals("No existe ese rider", pioService.consultarPedidosEn("noexiste"));
+		assertNotSame("", pioService.consultarPedidosEn("rider1@rider1.com"));
+	}
+	
+	void consultarValoracionResTest() throws JSONException {
+		String nombreRes = "PruebaRe";
+		assertEquals("No existe ese restaurante", pioService.consultarValoracionRes(nombreRes));
+		nombreRes = "PruebaRes";
+		assertNotSame("", pioService.consultarValoracionRes(nombreRes));
+	}
+	
+	void consultarValoracionMediaResTest() throws JSONException {
+		String nombreRes = "PruebaRe";
+		assertEquals("No existe ese restaurante", pioService.consultarMedia(nombreRes));
+		nombreRes = "PruebaRes";
+		assertNotSame("", pioService.consultarMedia(nombreRes));
+	}
+	
+	void consultarValoracionMediaRiderTest() throws JSONException {
+		String rider = "rider@ridercom";
+		assertEquals("No existe ese rider", pioService.consultarMediaRyder(rider));
+		rider = "rider@rider.com";
+		assertNotSame("", pioService.consultarMediaRyder(rider));
+	}
+	
+	void consultarValoracionRiderTest() throws JSONException {
+		String rider = "rider@ridercom";
+		assertEquals("No existe ese rider", pioService.consultarValoracionRider(rider));
+		rider = "rider@rider.com";
+		assertNotSame("", pioService.consultarValoracionRider(rider));
+	}
+	
+	void hacerValoracionTest() throws JSONException {
+		JSONObject jso = new JSONObject();
+		jso.put("correoAcceso", "nacho@gmail.com");
+		jso.put("comentario", "Comentario de prueba");
+		jso.put("entidad", "PruebaRes");
+		jso.put("valor", "4");
+		assertEquals("Valoracion realizada", pioService.hacerValoracion(jso));
+		jso.put("entidad", "rider@rider.com");
+		assertEquals("Valoracion realizada", pioService.hacerValoracion(jso));
+	}
+	
+	void consultarFacturacionTest() throws JSONException {
+		JSONObject jso = new JSONObject();
+		jso.put("fechaInicio", "2022-10-01");
+		jso.put("fechaFinal", "2023-01-01");
+		jso.put("restaurante", "PruebaRe");
+		assertEquals("No existe ese restaurante", pioService.consultarFacturacion(jso));
+		jso.put("restaurante", "PruebaRes");
+		assertNotSame("", pioService.consultarFacturacion(jso));
+		jso.put("fechaInicio", "2035-11-11");
+		jso.put("fechaFinal", "2035-12-11");
+		assertEquals("No hay pedidos entre esas fechas", pioService.consultarFacturacion(jso));
+	}
+	
+	void asignarYentregarRiderTest() {
+		String idPedido = "noexiste";
+		String rider = "rider1@rider1.com";
+		assertEquals("No existe ese pedido", pioService.asignarRider(idPedido, rider));
+		assertEquals("No existe ese pedido", pioService.ponerEntregado(idPedido, rider));
+		idPedido = "0d605f33-f6e5-4669-b385-163449426025";
+		assertEquals("Rider asignado", pioService.asignarRider(idPedido, rider));
+		this.consultarPedidosEnTest();
+		assertEquals("El pedido ya se ha asignado", pioService.asignarRider(idPedido, rider));
+		assertEquals("No te corresponde entregar este pedido", pioService.ponerEntregado(idPedido, "rider@rider.com"));
+		assertEquals("Pedido entregado", pioService.ponerEntregado(idPedido, rider));
+		assertEquals("El pedido ya se ha entregado", pioService.ponerEntregado(idPedido, rider));
+		pioService.resetState(idPedido);
+	}
+	
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

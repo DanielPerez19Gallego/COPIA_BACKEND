@@ -272,5 +272,12 @@ public class PedidoService {
                 .mapToInt(a -> a)
                 .average().orElse(0);
     }
+	
+	public void resetState(String idPedido) {
+		Pedido pe = this.pioDAO.findByidPedido(idPedido);
+		pe.setEstado(0);
+		this.pioDAO.deleteByidPedido(idPedido);
+		this.pioDAO.save(pe);
+	}
 
 }

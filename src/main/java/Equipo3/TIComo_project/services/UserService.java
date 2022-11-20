@@ -42,6 +42,8 @@ public class UserService {
 	private String matricula = "matricula";
 	private String apellidos = "apellidos";
 	private String password = "contraseña";
+	private String activo = "activo";
+	private String tipoVehiculo = "tipoVehiculo";
 
 	@Autowired
 	private SecurityService secService;
@@ -98,7 +100,7 @@ public class UserService {
 			riderr.setCarnet(Boolean.valueOf(jso.getString(this.carnet)));
 			riderr.setCorreo(jso.getString(this.correo));
 			riderr.setMatricula(jso.getString(this.matricula ));
-			riderr.setTipovehiculo(jso.getString("tipoVehiculo"));
+			riderr.setTipovehiculo(jso.getString(this.tipoVehiculo));
 			riderr.setActivo(true);
 			this.riderDAO.save(riderr);
 		} else {
@@ -150,8 +152,8 @@ public class UserService {
 				Rider riderr = this.riderDAO.findByCorreo(correo);
 				riderr.setCarnet(Boolean.valueOf(json.getString(this.carnet)));
 				riderr.setMatricula(json.getString(this.matricula));
-				riderr.setTipovehiculo(json.getString("tipoVehiculo"));
-				riderr.setActivo(Boolean.valueOf(json.getString("activo")));
+				riderr.setTipovehiculo(json.getString(this.tipoVehiculo));
+				riderr.setActivo(Boolean.valueOf(json.getString(this.activo)));
 				this.riderDAO.deleteByCorreo(correo);
 				this.riderDAO.save(riderr);
 			}else {
@@ -162,13 +164,41 @@ public class UserService {
 		return false;
 	}
 
+	public boolean actualizarUsuarioCliente(String correo,JSONObject json){
+		if (this.actualizarUserCli(correo, json)) {
+			this.actualizarCliente(correo, json);
+			return true;
+		}
+		return false;
+	}
 	public void actualizarCli(String correo, JSONObject json) {
 		Client clientt = this.clientDAO.findByCorreo(correo);
 		clientt.setDireccion(json.getString(this.direccion));
 		clientt.setTelefono(json.getString(this.telefono));
-		clientt.setActivo(Boolean.valueOf(json.getString("activo")));
+		clientt.setActivo(Boolean.valueOf(json.getString(this.activo)));
 		this.clientDAO.deleteByCorreo(correo);
 		this.clientDAO.save(clientt);
+	}
+	
+	public void actualizarCliente(String correo, JSONObject json) {
+		Client clientt = this.clientDAO.findByCorreo(correo);
+		clientt.setDireccion(json.getString(this.direccion));
+		clientt.setTelefono(json.getString(this.telefono));
+		this.clientDAO.deleteByCorreo(correo);
+		this.clientDAO.save(clientt);
+	}
+	
+	public boolean actualizarUserCli(String correo, JSONObject json){
+		User nuevo = this.userDAO.findByCorreo(correo);
+		if (nuevo!=null) {
+			nuevo.setPassword(this.secService.encriptar(json.getString("pwd1")));
+			nuevo.setNombre(json.getString(this.nombre));
+			nuevo.setApellidos(json.getString(this.apellidos));
+			nuevo.setRol(json.getString("rol"));
+			this.userDAO.deleteByCorreo(correo);
+			this.userDAO.save(nuevo);
+			return true;
+		} return false;
 	}
 
 	public boolean actualizarUser(String correo, JSONObject json){
@@ -192,11 +222,11 @@ public class UserService {
 		jso.put(this.password, this.secService.desencriptar(user.getPassword()));
 		jso.put(this.apellidos, user.getApellidos());
 		jso.put(this.correo, rid.getCorreo());
-		jso.put("tipoVehiculo", rid.getTipovehiculo());
+		jso.put(this.tipoVehiculo, rid.getTipovehiculo());
 		jso.put("nif", this.secService.desencriptar(user.getNif()));
 		jso.put(this.carnet, rid.isCarnet());
 		jso.put(this.matricula, rid.getMatricula());
-		jso.put("activo", rid.isActivo());
+		jso.put(this.activo, rid.isActivo());
 		return jso;	
 	}
 
@@ -248,7 +278,7 @@ public class UserService {
 		jso.put("nif",this.secService.desencriptar(user.getNif()));
 		jso.put(this.direccion, client.getDireccion());
 		jso.put(this.telefono, client.getTelefono());
-		jso.put("activo", client.isActivo());
+		jso.put(this.activo, client.isActivo());
 		return jso;    
 	}
 
@@ -275,6 +305,14 @@ public class UserService {
 
 	public List<Client> consultarClients(){
 		return this.clientDAO.findAll();
+	}
+
+	public String consultarDatosCliente(String cliente) {
+		Client clientt = this.clientDAO.findByCorreo(cliente);
+		StringBuilder bld = new StringBuilder();
+		JSONObject jso = this.userClient(clientt);
+		bld.append(jso.toString());
+		return bld.toString();
 	}
 
 }
