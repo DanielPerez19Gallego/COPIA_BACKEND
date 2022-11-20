@@ -38,6 +38,8 @@ public class PedidoService {
 	private String noexiste = "No existe ese pedido";
 	private String noexisteRes = "No existe ese restaurante";
 	private String noexisteRy = "No existe ese rider";
+	
+	private int maximoAsignados = 5;
 
 	public String crearPedido(JSONObject jso) {
 		Pedido pedido = new Pedido();
@@ -128,6 +130,8 @@ public class PedidoService {
 				return "El pedido ya se ha asignado";
 			else if (pedi.getEstado() == 2)
 				return "El pedido ya se ha entregado";
+			if(this.pioDAO.findAllByEstadoAndRider(1, rider).size() > this.maximoAsignados)
+				return "No te puedes asignar a mas pedidos";
 			pedi.setEstado(1);
 			pedi.setRider(rider);
 			this.pioDAO.deleteByidPedido(idPedido);
