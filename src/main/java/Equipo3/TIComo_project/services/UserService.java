@@ -13,6 +13,7 @@ import Equipo3.TIComo_project.model.Rider;
 import Equipo3.TIComo_project.dao.UserRepository;
 import Equipo3.TIComo_project.dao.AdminRepository;
 import Equipo3.TIComo_project.dao.ClientRepository;
+import Equipo3.TIComo_project.dao.PedidoRepository;
 import Equipo3.TIComo_project.dao.RiderRepository;
 
 
@@ -33,6 +34,9 @@ public class UserService {
 	
 	@Autowired
 	private PedidoService pioService;
+	
+	@Autowired
+	private PedidoRepository pioDAO;
 
 	private String correo = "correo";
 	private String client = "client";
@@ -132,7 +136,7 @@ public class UserService {
 		if (user != null) {
 			String rol = user.getRol();
 			if (rol.equals(this.rider)) {
-				if(!this.pioService.consultarPedidosEn(correoUsuario).isEmpty())
+				if(!this.pioDAO.findAllByEstadoAndRider(1, correoUsuario).isEmpty())
 					return "El rider esta asignado a un pedido";
 				this.riderDAO.deleteByCorreo(correoUsuario);
 			}else if (rol.equals(this.client)) {
