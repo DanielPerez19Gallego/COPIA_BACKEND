@@ -61,7 +61,7 @@ public class PedidoService {
 		if (pedi != null) {
 			if(pedi.getEstado() != 0)
 				return "Ya no puedes cancelar el pedido";
-			if(pedi.getCliente().equals(cliente))
+			if(!pedi.getCliente().equals(cliente))
 				return "No puedes cancelar el pedido, no es tuyo";
 			this.pioDAO.deleteByidPedido(idPedido);
 			return "Pedido cancelado";
@@ -278,6 +278,18 @@ public class PedidoService {
 		pe.setEstado(0);
 		this.pioDAO.deleteByidPedido(idPedido);
 		this.pioDAO.save(pe);
+	}
+
+	public boolean tienePedidosPendientes(String correoUsuario) {
+		List<Pedido> pedidos = this.pioDAO.findAllByCliente(correoUsuario);
+		if(pedidos != null) {
+			for (int i=0; i<pedidos.size();i++) {
+				Pedido ped = pedidos.get(i);
+				if (ped.getEstado() == 0 || ped.getEstado() == 1)
+					return true;
+			}
+		}
+		return false;
 	}
 
 }
