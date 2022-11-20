@@ -280,4 +280,16 @@ public class PedidoService {
 		this.pioDAO.save(pe);
 	}
 
+	public boolean tienePedidosPendientes(String correoUsuario) {
+		List<Pedido> pedidos = this.pioDAO.findAllByCliente(correoUsuario);
+		if(pedidos != null) {
+			for (int i=0; i<pedidos.size();i++) {
+				Pedido ped = pedidos.get(i);
+				if (ped.getEstado() == 0 || ped.getEstado() == 1)
+					return true;
+			}
+		}
+		return false;
+	}
+
 }

@@ -30,6 +30,9 @@ public class UserService {
 
 	@Autowired
 	private AdminRepository adminDAO;
+	
+	@Autowired
+	private PedidoService pioService;
 
 	private String correo = "correo";
 	private String client = "client";
@@ -129,8 +132,12 @@ public class UserService {
 		if (user != null) {
 			String rol = user.getRol();
 			if (rol.equals(this.rider)) {
+				if(!this.pioService.consultarPedidosEn(correoUsuario).isEmpty())
+					return "El rider esta asignado a un pedido";
 				this.riderDAO.deleteByCorreo(correoUsuario);
 			}else if (rol.equals(this.client)) {
+				if(this.pioService.tienePedidosPendientes(correoUsuario))
+					return "El cliente tiene pedidos pendientes";
 				this.clientDAO.deleteByCorreo(correoUsuario);
 			}else {
 				this.adminDAO.deleteByCorreo(correoUsuario);
