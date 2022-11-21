@@ -159,11 +159,16 @@ public class PedidoService {
 	}
 	
 	public String hacerValoracion(JSONObject jso) {
+		String entidad = jso.getString("entidad");
+		if(this.isValorado(jso.getString("idPedido"), entidad))
+			return "Ya has valorado a "+entidad;
+
 		Valoracion valora = new Valoracion();
 		valora.setAutor(jso.getString("correoAcceso"));
 		valora.setComentario(jso.getString("comentario"));
 		valora.setEntidad(jso.getString("entidad"));
 		valora.setFecha();
+		valora.setIdPedido(jso.getString("idPedido"));
 		valora.setValor(Integer.parseInt(jso.getString("valor")));
 		this.valDAO.save(valora);
 		return "Valoracion realizada";
@@ -187,7 +192,7 @@ public class PedidoService {
 			StringBuilder bld = new StringBuilder();
 			for(int i=0; i<valoraciones.size();i++) {
 				Valoracion val = valoraciones.get(i);
-				JSONObject jso = val.toJSON(val.getEntidad());
+				JSONObject jso = val.toJSON();
 				if (i == valoraciones.size() - 1)
 					bld.append(jso.toString());
 				else
@@ -294,6 +299,18 @@ public class PedidoService {
 			}
 		}
 		return false;
+	}
+	
+	public boolean isValorado(String idPedido, String entidad) {
+		Valoracion val = this.valDAO.findByEntidadAndIdpedido(entidad, idPedido);
+		return val == null;
+	}
+	
+	public String dameValoracion(String idPedido, String entidad) {
+		Valoracion val = this.valDAO.findByEntidadAndIdpedido(entidad, idPedido);
+		if(val == null)
+			return "No hay";
+		return val.toJSON().toString();
 	}
 
 }

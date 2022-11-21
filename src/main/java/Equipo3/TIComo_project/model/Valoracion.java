@@ -13,6 +13,7 @@ public class Valoracion {
 	private int valor;
 	private String autor;
 	private String fecha;
+	private String idPedido;
 	
 	public String getEntidad() {
 		return entidad;
@@ -44,14 +45,21 @@ public class Valoracion {
 	public void setFecha() {
 		this.fecha = LocalDate.now().toString();
 	}
-	public JSONObject toJSON(String objeto) {
+	public JSONObject toJSON() {
 		JSONObject jso = new JSONObject();
-		jso.put(objeto, entidad);
+		jso.put("entidad", entidad);
 		jso.put("comentario", comentario);
 		jso.put("valor", valor);
 		jso.put("autor", autor);
 		jso.put("fecha", fecha);
+		jso.put("idPedido", idPedido);
 		return jso;
+	}
+	public String getIdPedido() {
+		return idPedido;
+	}
+	public void setIdPedido(String idPedido) {
+		this.idPedido = idPedido;
 	}
 	
 }

@@ -304,4 +304,24 @@ public class PedidoController {
 		}
 	}
 	
+	@CrossOrigin
+	@PostMapping("/consultarExisteValoracion")
+	public ResponseEntity<String> consultarExisteValoracion(@RequestBody Map<String, Object> info){
+		try {
+			JSONObject jso = new JSONObject(info);
+			if (this.secService.accesoCliente(jso)) {
+				String correoAccesoo = jso.getString(this.correoAcceso);
+				if(this.secService.isActivo(correoAccesoo)){
+					String entidad = jso.getString("entidad");
+					String idPedido = jso.getString("idPedido");
+					return new ResponseEntity<>(this.pedidoService.dameValoracion(entidad, idPedido), HttpStatus.OK);
+				}
+				return new ResponseEntity<>(this.inActivo, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(this.sinAcceso, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
 }
