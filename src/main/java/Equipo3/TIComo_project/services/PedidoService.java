@@ -160,7 +160,7 @@ public class PedidoService {
 	
 	public String hacerValoracion(JSONObject jso) {
 		String entidad = jso.getString("entidad");
-		if(this.isValorado(jso.getString("idPedido"), entidad))
+		if(!this.isValorado(jso.getString("idPedido"), entidad))
 			return "Ya has valorado a "+entidad;
 
 		Valoracion valora = new Valoracion();
