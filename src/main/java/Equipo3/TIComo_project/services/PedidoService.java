@@ -306,7 +306,7 @@ public class PedidoService {
 		return val == null;
 	}
 	
-	public String dameValoracion(String idPedido, String entidad) {
+	public String dameValoracion(String entidad, String idPedido) {
 		Valoracion val = this.valDAO.findByEntidadAndIdpedido(entidad, idPedido);
 		if(val == null)
 			return "No hay";
