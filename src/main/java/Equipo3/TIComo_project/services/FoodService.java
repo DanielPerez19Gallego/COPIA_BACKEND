@@ -128,7 +128,6 @@ public class FoodService {
 		String nombreNuevo = jso.getString(this.nombre);
 		String nombreRestaurante = jso.getString("nombreRestaurante");
 		String idPlato = jso.getString("idPlato");
-		//List <Plate> plato = this.platoDAO.findByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);//id aqui
 		Plate plato = this.platoDAO.findByidPlato(idPlato);
 		if (plato == null)
 			return "noexiste";
@@ -137,11 +136,14 @@ public class FoodService {
 
 		Plate platt = this.crearPlatoAux(jso, plato);
 
-		//this.platoDAO.deleteByNombreAndNombreRestaurante(nombreViejo, nombreRestaurante);//id aqui
 		this.platoDAO.deleteByidPlato(idPlato);
 		this.platoDAO.save(platt);
 
 		return "Plato actualizado correctamente";
+	}
+	
+	public String dameId(String nombre, String restaurante) {
+		return this.platoDAO.findByNombreAndNombreRestaurante(nombre, restaurante).get(0).getIdPlato();
 	}
 
 	public String platosParaEnviar(String nombreRestaurante) {
