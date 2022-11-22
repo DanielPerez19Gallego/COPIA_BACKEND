@@ -301,7 +301,7 @@ public class PedidoService {
 		return false;
 	}
 	
-	public boolean isValorado(String idPedido, String entidad) {
+	public boolean isValorado(String entidad, String idPedido) {
 		Valoracion val = this.valDAO.findByEntidadAndIdpedido(entidad, idPedido);
 		return val == null;
 	}
