@@ -40,8 +40,10 @@ class TiComoProjectApplicationTests {
 		assertNotSame("", food.consultarRestaurantes());
 		assertEquals("", food.platosParaEnviar("prueba"));
 		this.crearPlatoTest();
+		this.actualizarPlatoTest();
 		assertNotSame("", food.platosParaEnviar("prueba"));
 		this.actualizarRestauranteTest();
+		this.eliminarPlatoTest();
 		this.eliminarCartaTest();
 		this.eliminarRestauranteTest();
 	}
@@ -74,6 +76,31 @@ class TiComoProjectApplicationTests {
 		assertEquals("nombre", food.crearPlato(jso));
 		jso.put("nombre", "platoPrueba2");
 		assertEquals("Plato creado correctamente", food.crearPlato(jso));
+		jso.put("nombre", "PRUEBAPLATO");
+		assertEquals("Plato creado correctamente", food.crearPlato(jso));
+	}
+	
+	void eliminarPlatoTest() throws JSONException {
+		JSONObject jso = new JSONObject();
+		jso.put("idPlato", "nombre");
+		String idPlato = this.food.dameId("PRUEBAPLATO", "prueba");
+		assertEquals("nombre", this.food.eliminarPlato(jso));
+		jso.put("idPlato", idPlato);
+		assertEquals("Plato eliminado correctamente", this.food.eliminarPlato(jso));
+	}
+	
+	void actualizarPlatoTest() throws JSONException {
+		JSONObject jso = new JSONObject();
+		jso.put("nombreViejo","PRUEBAPLATO");
+		jso.put("nombre","PRUEBAPLATO");
+		String idPlato = this.food.dameId("PRUEBAPLATO", "prueba");
+		jso.put("nombreRestaurante", "prueba");
+		jso.put("idPlato", idPlato);
+		jso.put("descripcion","No borrar");
+		jso.put("precio","30");
+		jso.put("foto","foto");
+		jso.put("aptoVegano", "true");
+		assertEquals("Plato actualizado correctamente", this.food.actualizarPlato(jso));
 	}
 
 	void actualizarRestauranteTest() throws JSONException {
@@ -458,6 +485,7 @@ class TiComoProjectApplicationTests {
 		assertEquals("No existe ese restaurante", pioService.consultarValoracionRes(nombreRes));
 		nombreRes = "PruebaRes";
 		assertNotSame("", pioService.consultarValoracionRes(nombreRes));
+		assertEquals("No hay", pioService.dameValoracion("id_fake", "entidad_fake"));
 	}
 	
 	void consultarValoracionMediaResTest() throws JSONException {
@@ -487,6 +515,7 @@ class TiComoProjectApplicationTests {
 		jso.put("comentario", "Comentario de prueba");
 		jso.put("entidad", "PruebaRes");
 		jso.put("valor", "4");
+		jso.put("idPedido", "1a1b281c-4b5d-4436-a85a-5a08e2532391");
 		assertEquals("Valoracion realizada", pioService.hacerValoracion(jso));
 		jso.put("entidad", "rider@rider.com");
 		assertEquals("Valoracion realizada", pioService.hacerValoracion(jso));
@@ -510,7 +539,7 @@ class TiComoProjectApplicationTests {
 		String rider = "rider1@rider1.com";
 		assertEquals("No existe ese pedido", pioService.asignarRider(idPedido, rider));
 		assertEquals("No existe ese pedido", pioService.ponerEntregado(idPedido, rider));
-		idPedido = "0d605f33-f6e5-4669-b385-163449426025";
+		idPedido = "1a1b281c-4b5d-4436-a85a-5a08e2532391";
 		assertEquals("Rider asignado", pioService.asignarRider(idPedido, rider));
 		this.consultarPedidosEnTest();
 		assertEquals("El pedido ya se ha asignado", pioService.asignarRider(idPedido, rider));
